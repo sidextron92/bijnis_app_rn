@@ -11,7 +11,9 @@
   - [TypeScript Types](#typescript-types)
   - [Mock Endpoints](#mock-endpoints)
   - [Integration Guide](#integration-guide)
-- [Transparent Backgrounds](#transparent-backgrounds)
+- [Search Placeholders](#search-placeholders)
+- [Promotional Banner](#promotional-banner)
+- [Animation Libraries](#animation-libraries)
 - [Mock Scenarios](#mock-scenarios)
 - [Utility Functions](#utility-functions)
 - [Best Practices](#best-practices)
@@ -34,14 +36,27 @@ The `HomeHeader` component is a highly flexible, API-driven header component for
 - Supports solid colors, gradients, images, and custom components
 - Enables seamless visual flow from toolbar to promotional banner
 
-#### 2. Animated Tab Navigation
+#### 2. Typewriter Effect Search Placeholders
+- **Custom typewriter animation** with character-by-character typing
+- Keeps "Search " constant while animating words
+- Fully compatible with iOS, Android, and Web
+- Smooth deletion and cycling through multiple search terms
+
+#### 3. Animated Tab Navigation
 - **Smooth sliding indicator** with spring animation
 - Indicator slides and resizes dynamically when switching tabs
 - 60fps performance using React Native's Animated API
 - Spring physics with configurable friction and tension
 - Automatic layout measurement for different tab widths
 
-#### 3. Component Structure
+#### 4. Simplified Full-Width Banner
+- Single promotional banner (no carousel complexity)
+- Supports static images, Rive animations, or Lottie animations
+- Full-width design with customizable aspect ratio
+- No text overlays or CTAs - pure visual content
+- Tappable with navigation support
+
+#### 5. Component Structure
 
 ```
 HomeHeader
@@ -51,26 +66,15 @@ HomeHeader
 │   └── User avatar
 ├── Search Bar
 │   ├── Search icon
-│   ├── Animated placeholders (ViewFlipper)
+│   ├── Typewriter placeholders (custom animation)
 │   └── Voice search icon
 ├── Category Tab Navigation
 │   ├── Horizontal scrollable tabs with icons
 │   ├── Animated sliding indicator (spring animation)
 │   └── Separator line
 └── Promotional Banner (optional)
-    ├── Title and subtitle
-    ├── Banner image
-    └── CTA button
+    └── Full-width image or animation
 ```
-
-#### 4. Section Backgrounds
-Each section has an independent, optional background color that overlays the main container background:
-- Toolbar background
-- Search bar background
-- Tab navigation background
-- Promotional banner background
-
-All sections default to `transparent`, allowing the main background to show through.
 
 ---
 
@@ -109,7 +113,7 @@ All sections default to `transparent`, allowing the main background to show thro
 |------|------|---------|-------------|
 | `userInitials` | `string` | `undefined` | User initials for avatar (e.g., "SU") |
 | `userAvatarUri` | `string` | `undefined` | User avatar image URI |
-| `searchPlaceholders` | `string[]` | `['Search "ice-cream"', ...]` | Array of search placeholders to cycle through |
+| `searchPlaceholders` | `string[]` | `['ice-cream', 'vegetables', 'snacks']` | Array of words to animate (without "Search" prefix) |
 
 #### Category Tabs
 
@@ -131,22 +135,20 @@ interface CategoryTab {
 }
 ```
 
-#### Promotional Banner
+#### Promotional Banner (Simplified)
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `promotionalBanner` | `object` | `undefined` | Promotional banner configuration |
+| `promotionalBanner` | `object` | `undefined` | Single promotional banner configuration |
 
 **Promotional Banner Interface:**
 ```typescript
 interface PromotionalBanner {
-  backgroundColor?: string;  // Overlay background (transparent by default)
-  backgroundGradient?: string[];  // Gradient colors
-  gradientLocations?: { start: {x, y}, end: {x, y} };
-  backgroundImageUri?: string;  // Background image
-  title?: string;           // Banner title
-  subtitle?: string;        // Banner subtitle/date
-  imageUri?: string;        // Banner image URI
+  imageUri?: string;              // Static image URL
+  animationUri?: string;          // Animation file URL (Rive/Lottie)
+  animationType?: 'rive' | 'lottie';  // Animation type
+  aspectRatio?: number;           // Width/height ratio (default: 16/9)
+  onPress?: () => void;           // Tap handler
 }
 ```
 
@@ -160,7 +162,7 @@ interface PromotionalBanner {
 
 ### Usage Examples
 
-#### Basic Usage (Solid Color)
+#### Basic Usage with Typewriter Placeholders
 
 ```tsx
 import { HomeHeader } from '@/features/home';
@@ -170,6 +172,7 @@ import { HomeHeader } from '@/features/home';
   location="Agra - 226010"
   backgroundColor="#058234"
   userInitials="SU"
+  searchPlaceholders={['ice-cream', 'vegetables', 'snacks']}  // Just words, no "Search" prefix
   categoryTabs={[
     { id: 'footwear', label: 'Footwear' },
     { id: 'apparel', label: 'Apparel' },
@@ -177,51 +180,7 @@ import { HomeHeader } from '@/features/home';
 />
 ```
 
-#### Linear Gradient Background
-
-```tsx
-<HomeHeader
-  deliveryTime="22 minutes"
-  location="Agra - 226010"
-  backgroundGradient={['#058234', '#03A64A', '#00C853']}
-  gradientLocations={{
-    start: { x: 0, y: 0 },
-    end: { x: 0, y: 1 }
-  }}
-  userInitials="SU"
-/>
-```
-
-#### With Tabs and Icons
-
-```tsx
-<HomeHeader
-  deliveryTime="22 minutes"
-  location="Agra - 226010"
-  backgroundGradient={['#058234', '#00C853']}
-  categoryTabs={[
-    {
-      id: 'footwear',
-      label: 'Footwear',
-      iconUrls: {
-        default: 'https://example.com/footwear-inactive.png',
-        pressed: 'https://example.com/footwear-active.png',
-      }
-    },
-    {
-      id: 'apparel',
-      label: 'Apparel',
-      iconUrls: {
-        default: 'https://example.com/apparel-inactive.png',
-        pressed: 'https://example.com/apparel-active.png',
-      }
-    },
-  ]}
-  initialSelectedTab="footwear"
-/>
-```
-
-#### With Transparent Banner
+#### With Full-Width Image Banner
 
 ```tsx
 <HomeHeader
@@ -229,36 +188,229 @@ import { HomeHeader } from '@/features/home';
   location="Agra - 226010"
   backgroundGradient={['#058234', '#00C853']}
   promotionalBanner={{
-    backgroundColor: 'transparent',  // Shows main gradient
-    title: 'Housefull Deals',
-    subtitle: '20th Nov, 2024 - 7th Dec, 2024',
-    imageUri: 'https://example.com/banner.png'
+    imageUri: 'https://example.com/banner.png',
+    aspectRatio: 2.5,  // 2.5:1 aspect ratio
+    onPress: () => router.push('/offers'),
   }}
 />
 ```
 
-#### Full Example with Mock API
+#### With Rive Animation Banner
 
 ```tsx
-import { useHomeHeaderData, transformHomeHeaderData } from '@/mocks';
+<HomeHeader
+  deliveryTime="22 minutes"
+  location="Agra - 226010"
+  backgroundGradient={['#058234', '#00C853']}
+  promotionalBanner={{
+    animationUri: 'https://example.com/banner.riv',
+    animationType: 'rive',
+    aspectRatio: 16 / 9,
+    onPress: () => router.push('/special-offers'),
+  }}
+/>
+```
 
-function HomeScreen() {
-  const { data, isLoading, error } = useHomeHeaderData();
+---
 
-  if (isLoading) return <ActivityIndicator />;
-  if (error || !data) return <ErrorView />;
+## Search Placeholders
 
-  const headerProps = transformHomeHeaderData(data, {
-    onLocationPress: () => {
-      console.log('Location pressed');
-    },
-    onTabSelect: (tabId) => {
-      console.log('Tab selected:', tabId);
-    },
-  });
+### Typewriter Effect
 
-  return <HomeHeader {...headerProps} />;
+The search bar uses a **custom typewriter animation** that keeps "Search " constant and animates the changing words.
+
+#### Format
+
+Pass **just the words** (without "Search" prefix or quotes):
+
+```typescript
+searchPlaceholders={['ice-cream', 'vegetables', 'snacks', 'dairy products']}
+```
+
+#### How It Works
+
+The component automatically:
+1. Displays "Search " (constant)
+2. Types out the word character by character: `"ice-cream"`
+3. Wraps it in quotes: `"Search "ice-cream""`
+4. Pauses for 2 seconds
+5. Deletes back to "Search "
+6. Types the next word
+7. Loops infinitely
+
+#### Customization
+
+The TypewriterText component supports customization:
+- **Typing speed**: 100ms per character
+- **Delete speed**: 50ms per character
+- **Delay between words**: 2000ms (2 seconds)
+- **Cross-platform**: Works on iOS, Android, and Web
+
+#### Migration from ViewFlipper
+
+**Old format (deprecated):**
+```typescript
+searchPlaceholders={[
+  'Search "ice-cream"',    // ❌ Don't include "Search" prefix
+  'Search "vegetables"',   // ❌ Don't include quotes
+]}
+```
+
+**New format:**
+```typescript
+searchPlaceholders={[
+  'ice-cream',      // ✅ Just the word
+  'vegetables',     // ✅ Just the word
+]}
+```
+
+---
+
+## Promotional Banner
+
+### Simplified Banner Design
+
+The banner has been **simplified** to focus on visual impact:
+
+**Removed:**
+- ❌ Multiple banners (carousel)
+- ❌ Title and subtitle text
+- ❌ CTA buttons
+- ❌ Complex background configurations
+- ❌ Priority sorting
+
+**New Features:**
+- ✅ Single full-width banner
+- ✅ Image OR animation support
+- ✅ Clean, modern design
+- ✅ Customizable aspect ratio
+- ✅ Tappable for navigation
+
+### Banner Types
+
+#### 1. Static Image Banner
+
+```typescript
+banner: {
+  type: 'image',
+  url: 'https://example.com/banner.png',
+  aspectRatio: 16 / 9,  // Optional, defaults to 16:9
+  target: {
+    type: 'screen',
+    config: {
+      screen: 'CategoryScreen',
+      params: { category: 'offers' }
+    }
+  }
 }
+```
+
+#### 2. Rive Animation Banner (Recommended)
+
+```typescript
+banner: {
+  type: 'rive',
+  url: 'https://example.com/banner.riv',
+  aspectRatio: 2.5,  // Wider aspect ratio
+  target: {
+    type: 'screen',
+    config: {
+      screen: 'OffersScreen'
+    }
+  }
+}
+```
+
+#### 3. Lottie Animation Banner
+
+```typescript
+banner: {
+  type: 'lottie',
+  url: 'https://example.com/banner.json',
+  aspectRatio: 16 / 9
+}
+```
+
+### Aspect Ratios
+
+Common aspect ratios:
+- **16:9** = `16 / 9` = 1.778 (widescreen, default)
+- **2.5:1** = `2.5` (ultra-wide, Swiggy/Blinkit style)
+- **4:3** = `4 / 3` = 1.333 (more square)
+- **21:9** = `21 / 9` = 2.333 (cinematic)
+
+### Image Guidelines
+
+**Recommended Sizes:**
+- 16:9 format: 1920x1080 px
+- 2.5:1 format: 2500x1000 px
+
+**Optimization:**
+- Use WebP format for better compression
+- Keep file sizes under 200 KB
+- Export at 2x for Retina displays
+
+---
+
+## Animation Libraries
+
+### RIVE vs Lottie Comparison
+
+| Feature | **Rive** (Recommended) | Lottie |
+|---------|----------------------|--------|
+| **Performance** | ✅ ~60 FPS | ⚠️ ~17 FPS |
+| **File Size** | ✅ 2 KB (avg) | ⚠️ 24 KB (avg) |
+| **CPU Usage** | ✅ 31.8% | ⚠️ 91.8% |
+| **GPU Memory** | ✅ 2.6 MB | ⚠️ 149-190 MB |
+| **Interactivity** | ✅ State machines | ❌ Limited |
+| **Web Support** | ✅ Yes | ✅ Yes |
+| **React Native** | ✅ Excellent | ✅ Good |
+| **Battery Impact** | ✅ Low | ⚠️ Higher |
+
+### Why RIVE is Recommended
+
+**Performance Benefits:**
+- 3.5x faster frame rate (60 vs 17 FPS)
+- 12x smaller file sizes
+- 3x lower CPU usage
+- Better battery efficiency
+
+**Interactive Capabilities:**
+- Real-time state machines
+- User interaction support
+- Dynamic parameter changes
+- Perfect for loading states
+
+**Modern Workflow:**
+- Native Rive editor (no After Effects)
+- Export once, works everywhere
+- Built-in state management
+- Version control friendly
+
+### When to Use Each
+
+**Use RIVE if:**
+- ✅ Interactive banner content
+- ✅ Performance is critical
+- ✅ File size matters
+- ✅ You need state machines
+
+**Use Lottie if:**
+- ✅ Design team uses After Effects
+- ✅ Simple playback animations
+- ✅ Quick marketing campaigns
+- ✅ Legacy integration
+
+### Installation
+
+**For RIVE:**
+```bash
+pnpm add rive-react-native
+```
+
+**For Lottie:**
+```bash
+pnpm add lottie-react-native
 ```
 
 ---
@@ -277,12 +429,25 @@ interface HomeHeaderApiResponse {
   search: SearchConfig;
   user: UserInfo;
   tabs: TabsConfig;
-  banners: PromotionalBanner[];
+  banner?: SimpleBanner;        // NEW: Single banner
+  banners?: PromotionalBanner[]; // DEPRECATED
   metadata?: ApiMetadata;
 }
 ```
 
-#### Complete Example Response
+#### SimpleBanner Interface (New)
+
+```typescript
+export interface SimpleBanner {
+  type: 'image' | 'rive' | 'lottie';
+  url: string;
+  aspectRatio?: number;
+  target?: NavigationTarget;
+  analytics?: AnalyticsData;
+}
+```
+
+### Complete Example Response
 
 ```json
 {
@@ -290,15 +455,9 @@ interface HomeHeaderApiResponse {
     "label": "Delivery In",
     "value": "22 Minutes",
     "location": {
-      "addressLine": "Home - Sector 12",
       "city": "Agra",
       "pincode": "226010",
       "formatted": "Agra - 226010"
-    },
-    "estimatedRange": {
-      "min": 15,
-      "max": 20,
-      "unit": "minutes"
     }
   },
   "background": {
@@ -306,679 +465,136 @@ interface HomeHeaderApiResponse {
     "config": {
       "colors": ["#058234", "#03A64A", "#00C853"],
       "start": { "x": 0, "y": 0 },
-      "end": { "x": 0, "y": 1 },
-      "type": "linear"
+      "end": { "x": 0, "y": 1 }
     }
-  },
-  "sectionBackgrounds": {
-    "toolbar": null,
-    "searchBar": null,
-    "tabNavigation": null
   },
   "search": {
     "placeholders": [
-      "Search \"ice-cream\"",
-      "Search \"vegetables\"",
-      "Search \"snacks\""
+      "ice-cream",
+      "vegetables",
+      "snacks"
     ],
     "voiceEnabled": true
   },
-  "user": {
-    "name": "Sujal Dave",
-    "initials": "SU",
-    "avatarUrl": null,
-    "notificationCount": 0
-  },
-  "tabs": {
-    "background": null,
-    "selectedTabId": "footwear",
-    "items": [
-      {
-        "id": "footwear",
-        "label": "Footwear",
-        "icon": {
-          "default": "https://example.com/icons/footwear-inactive.png",
-          "pressed": "https://example.com/icons/footwear-active.png"
-        },
-        "badge": null,
-        "enabled": true,
-        "visible": true,
-        "analytics": {
-          "category": "navigation",
-          "action": "tab_click_footwear"
-        }
-      }
-    ]
-  },
-  "banners": [
-    {
-      "id": "housefull-deals",
-      "priority": 1,
-      "background": {
-        "type": "solid",
-        "config": {
-          "color": "transparent"
-        }
-      },
-      "content": {
-        "title": "Housefull Deals",
-        "subtitle": "20th Nov, 2024 - 7th Dec, 2024",
-        "imageUrl": "https://example.com/banners/deals.png"
-      },
-      "cta": {
-        "text": "Shop Now",
-        "style": "primary"
-      },
-      "target": {
-        "type": "screen",
-        "config": {
-          "screen": "CategoryScreen",
-          "params": {
-            "category": "special-offers"
-          }
-        }
-      },
-      "analytics": {
-        "impressionTrackingId": "banner_housefull_impression",
-        "clickTrackingId": "banner_housefull_click"
+  "banner": {
+    "type": "image",
+    "url": "https://example.com/banner.png",
+    "aspectRatio": 2.5,
+    "target": {
+      "type": "screen",
+      "config": {
+        "screen": "OffersScreen"
       }
     }
-  ],
-  "metadata": {
-    "lastUpdated": "2024-12-03T15:30:00Z",
-    "version": "1.0.0",
-    "trackingId": "home_header_123456"
   }
 }
 ```
-
-### TypeScript Types
-
-#### Core Types
-
-```typescript
-// Background Configuration
-export type BackgroundType = 'solid' | 'gradient' | 'image' | 'animation' | 'video';
-
-export interface BackgroundConfig {
-  type: BackgroundType;
-  config: SolidConfig | GradientConfig | ImageConfig | AnimationConfig | VideoConfig;
-}
-
-export interface SolidConfig {
-  color: string;  // Hex color (use 'transparent' or rgba for transparency)
-}
-
-export interface GradientConfig {
-  colors: string[];
-  start: { x: number; y: number };  // 0-1 range
-  end: { x: number; y: number };    // 0-1 range
-  type?: 'linear' | 'radial';
-}
-
-export interface ImageConfig {
-  url: string;
-  resizeMode?: 'cover' | 'contain' | 'stretch' | 'repeat';
-  opacity?: number;  // 0-1
-}
-
-// Delivery Types
-export interface DeliveryInfo {
-  label: string;
-  value: string;
-  location: LocationInfo;
-  estimatedRange?: EstimatedRange;
-}
-
-export interface LocationInfo {
-  addressLine?: string;
-  city: string;
-  pincode: string;
-  formatted: string;
-}
-
-export interface EstimatedRange {
-  min: number;
-  max: number;
-  unit: 'minutes' | 'hours' | 'days';
-}
-
-// Tab Navigation Types
-export interface TabsConfig {
-  background?: BackgroundConfig | null;
-  selectedTabId?: string;
-  items: TabItem[];
-}
-
-export interface TabItem {
-  id: string;
-  label: string;
-  icon: TabIcon;
-  badge?: TabBadge | null;
-  enabled: boolean;
-  visible: boolean;
-  analytics?: AnalyticsData;
-}
-
-export interface TabIcon {
-  default: string;  // Unpressed icon URL
-  pressed: string;  // Pressed icon URL
-}
-
-export interface TabBadge {
-  count: number;
-  color?: string;
-}
-
-// Promotional Banner Types
-export interface PromotionalBanner {
-  id: string;
-  priority: number;
-  background: BackgroundConfig;
-  content: BannerContent;
-  cta?: BannerCTA;
-  target: NavigationTarget;
-  analytics?: AnalyticsData;
-}
-
-export interface BannerContent {
-  title?: string;
-  subtitle?: string;
-  imageUrl?: string | null;
-}
-
-export interface BannerCTA {
-  text: string;
-  style: 'primary' | 'secondary' | 'ghost';
-}
-
-// Navigation Target Types
-export interface NavigationTarget {
-  type: 'screen' | 'webview' | 'deeplink' | 'modal';
-  config: ScreenConfig | WebviewConfig | DeeplinkConfig | ModalConfig;
-}
-
-export interface ScreenConfig {
-  screen: string;
-  params?: Record<string, any>;
-}
-
-// Section Backgrounds
-export interface SectionBackgrounds {
-  toolbar?: BackgroundConfig | null;
-  searchBar?: BackgroundConfig | null;
-  tabNavigation?: BackgroundConfig | null;
-}
-```
-
-### Mock Endpoints
-
-#### Primary Endpoint
-
-```typescript
-import { fetchHomeHeader } from '@/mocks';
-
-async function fetchHomeHeader(params?: {
-  userId?: string;
-  location?: { lat: number; lng: number };
-}): Promise<HomeHeaderApiResponse>
-```
-
-**Parameters:**
-- `userId` (optional): User ID for personalization
-- `location` (optional): User's location for delivery estimation
-
-**Example:**
-```typescript
-const data = await fetchHomeHeader({
-  userId: 'user123',
-  location: { lat: 28.6139, lng: 77.2090 }
-});
-```
-
-#### Using the Hook
-
-```typescript
-import { useHomeHeaderData } from '@/mocks';
-
-function HomeScreen() {
-  const { data, isLoading, error, refetch } = useHomeHeaderData({
-    userId: 'user123',
-    autoRefresh: true,
-    refreshInterval: 60000, // Refresh every minute
-  });
-
-  if (isLoading) return <Skeleton />;
-  if (error) return <ErrorView error={error} onRetry={refetch} />;
-  if (!data) return null;
-
-  const headerProps = transformHomeHeaderData(data);
-  return <HomeHeader {...headerProps} />;
-}
-```
-
-### Integration Guide
-
-#### Step 1: Import Required Modules
-
-```typescript
-import {
-  useHomeHeaderData,
-  transformHomeHeaderData,
-  type HomeHeaderApiResponse,
-} from '@/mocks';
-import { HomeHeader } from '@/features/home';
-```
-
-#### Step 2: Fetch Data
-
-```typescript
-const { data, isLoading, error, refetch } = useHomeHeaderData({
-  userId: currentUser.id,
-  location: userLocation,
-});
-```
-
-#### Step 3: Transform and Render
-
-```typescript
-if (isLoading) return <LoadingSkeleton />;
-if (error) return <ErrorView error={error} onRetry={refetch} />;
-if (!data) return null;
-
-const headerProps = transformHomeHeaderData(data, {
-  onLocationPress: handleLocationPress,
-  onAvatarPress: handleAvatarPress,
-  onTabSelect: handleTabSelect,
-});
-
-return <HomeHeader {...headerProps} />;
-```
-
-#### Step 4: Handle Navigation
-
-```typescript
-const handleTabSelect = (tabId: string) => {
-  // Update selected category
-  setSelectedCategory(tabId);
-
-  // Fetch products for category
-  fetchProductsByCategory(tabId);
-
-  // Track analytics
-  analytics.track('tab_selected', { tabId });
-};
-```
-
----
-
-## Transparent Backgrounds
-
-### Making Backgrounds Transparent
-
-To make any background transparent, use one of these approaches:
-
-1. **Using 'transparent' keyword:**
-   ```typescript
-   background: {
-     type: 'solid',
-     config: {
-       color: 'transparent'
-     }
-   }
-   ```
-
-2. **Using rgba with alpha channel:**
-   ```typescript
-   background: {
-     type: 'solid',
-     config: {
-       color: 'rgba(0, 0, 0, 0)'  // Fully transparent
-     }
-   }
-   ```
-
-3. **Semi-transparent overlay:**
-   ```typescript
-   background: {
-     type: 'solid',
-     config: {
-       color: 'rgba(0, 0, 0, 0.3)'  // 30% opacity black overlay
-     }
-   }
-   ```
-
-### Promotional Banner Examples
-
-**1. Fully Transparent Banner (inherits main gradient):**
-```typescript
-{
-  id: 'transparent-banner',
-  priority: 1,
-  background: {
-    type: 'solid',
-    config: {
-      color: 'transparent'  // Banner will show main header gradient
-    }
-  },
-  content: {
-    title: 'Special Offer',
-    subtitle: 'Limited time only',
-  },
-}
-```
-
-**2. Semi-Transparent Overlay:**
-```typescript
-{
-  id: 'overlay-banner',
-  priority: 1,
-  background: {
-    type: 'solid',
-    config: {
-      color: 'rgba(0, 0, 0, 0.2)'  // 20% dark overlay over gradient
-    }
-  },
-  content: {
-    title: 'New Arrivals',
-  },
-}
-```
-
-**3. Glassmorphism Effect:**
-```typescript
-{
-  id: 'glass-banner',
-  priority: 1,
-  background: {
-    type: 'solid',
-    config: {
-      color: 'rgba(255, 255, 255, 0.15)'  // Frosted glass effect
-    }
-  },
-  content: {
-    title: 'Premium Collection',
-  },
-}
-```
-
-### Section Background Examples
-
-**Transparent toolbar (shows gradient):**
-```typescript
-sectionBackgrounds: {
-  toolbar: null,  // or use transparent config
-  searchBar: null,
-  tabNavigation: null,
-}
-```
-
-**Toolbar with subtle overlay:**
-```typescript
-sectionBackgrounds: {
-  toolbar: {
-    type: 'solid',
-    config: {
-      color: 'rgba(0, 0, 0, 0.1)'  // Subtle darkening
-    }
-  },
-  searchBar: null,
-  tabNavigation: null,
-}
-```
-
-### Common Use Cases
-
-- **Transparent promotional banner:** Lets the main header gradient show through
-- **Section backgrounds:** Add subtle overlays while preserving main background
-- **Glassmorphism effect:** Use semi-transparent white/black for modern UI
 
 ---
 
 ## Mock Scenarios
 
-Pre-configured scenarios for testing different states:
+Pre-configured scenarios for testing:
 
 ### Available Scenarios
 
 | Scenario | Description |
 |----------|-------------|
-| `solidBackground` | Solid green background instead of gradient |
-| `imageBackground` | Background image instead of gradient |
-| `longDelivery` | "Delivery By Tomorrow 11 PM" |
-| `noBanners` | No promotional banners |
-| `userWithAvatar` | User with avatar image and notifications |
-| `sectionBackgrounds` | Individual section background overlays |
+| `solidBackground` | Solid green background |
+| `imageBackground` | Background image |
+| `longDelivery` | "Tomorrow 11 PM" delivery |
+| `noBanner` | No promotional banner |
+| `riveBanner` | Rive animation banner example |
+| `lottieBanner` | Lottie animation banner example |
+| `userWithAvatar` | User with avatar and notifications |
 
 ### Usage
 
 ```typescript
 import { fetchHomeHeaderScenario } from '@/mocks';
 
-const data = await fetchHomeHeaderScenario('userWithAvatar');
-```
-
-Or with hook:
-
-```typescript
-const { data } = useHomeHeaderData({ scenario: 'longDelivery' });
-```
-
----
-
-## Utility Functions
-
-### Transform API to Component Props
-
-```typescript
-import { transformHomeHeaderData } from '@/mocks';
-
-const headerProps = transformHomeHeaderData(apiData, callbacks);
-```
-
-### Check Delivery Speed
-
-```typescript
-import { isFastDelivery } from '@/mocks';
-
-if (isFastDelivery(data)) {
-  // Show fast delivery badge
-}
-```
-
-### Get Sorted Banners
-
-```typescript
-import { getSortedBanners } from '@/mocks';
-
-const sortedBanners = getSortedBanners(data);
-// Returns banners sorted by priority
-```
-
-### Get Active Banner
-
-```typescript
-import { getActiveBanner } from '@/mocks';
-
-const activeBanner = getActiveBanner(data, currentIndex);
-// For carousel implementation
-```
-
-### Helper Functions
-
-```typescript
-import {
-  getFormattedDeliveryTime,
-  getVisibleTabsCount,
-  getNotificationCount,
-  hasUserAvatar,
-} from '@/mocks';
-
-const deliveryText = getFormattedDeliveryTime(data);
-// "Delivery In: 22 Minutes"
-
-const tabCount = getVisibleTabsCount(data);
-// Number of visible tabs
-
-const notifications = getNotificationCount(data);
-// User notification count
-
-const hasAvatar = hasUserAvatar(data);
-// Boolean: user has avatar image
-```
-
-### Type Guards
-
-Use type guards to safely handle different background types:
-
-```typescript
-import {
-  isSolidBackground,
-  isGradientBackground,
-  isImageBackground,
-} from '@/mocks';
-
-if (isGradientBackground(background)) {
-  // TypeScript knows background.config is GradientConfig
-  const colors = background.config.colors;
-}
+const data = await fetchHomeHeaderScenario('riveBanner');
 ```
 
 ---
 
 ## Best Practices
 
-1. **Error Handling**: Always handle loading and error states
-2. **Type Safety**: Use TypeScript types for type checking
-3. **Memoization**: Memoize transformed props to avoid re-renders
-4. **Analytics**: Track user interactions with tabs and banners
-5. **Personalization**: Pass user context for personalized content
-6. **Performance**: Use auto-refresh sparingly
-7. **Testing**: Use mock scenarios for different test cases
-8. **Images**: Optimize banner and background images before uploading
-9. **Gradients**: Limit to 2-3 colors for best performance
-10. **Contrast**: Test custom backgrounds for WCAG contrast compliance
-
----
-
-## Testing
-
-### Unit Tests
-
-```typescript
-import { fetchHomeHeader, transformHomeHeaderData } from '@/mocks';
-
-describe('Home Header API', () => {
-  it('fetches data successfully', async () => {
-    const data = await fetchHomeHeader();
-    expect(data).toBeDefined();
-    expect(data.delivery).toBeDefined();
-    expect(data.tabs.items.length).toBeGreaterThan(0);
-  });
-
-  it('transforms API data to component props', () => {
-    const apiData = await fetchHomeHeader();
-    const props = transformHomeHeaderData(apiData);
-
-    expect(props.deliveryTime).toBe('22 Minutes');
-    expect(props.location).toBe('Agra - 226010');
-    expect(props.categoryTabs).toBeDefined();
-  });
-});
-```
-
-### Test Cases
-- [ ] Renders with minimum required props
-- [ ] Displays correct delivery time and location
-- [ ] Calls callbacks when interactive elements are pressed
-- [ ] Renders tabs correctly and shows active state
-- [ ] ViewFlipper cycles through search placeholders
-- [ ] Applies gradient backgrounds correctly
-- [ ] Section backgrounds overlay main background
-- [ ] Promotional banner shows/hides based on data
-- [ ] Icons load from URLs correctly
-- [ ] Selected tab shows pressed icon state
+1. **Search Placeholders**: Use 3-5 words for optimal cycling
+2. **Banner Images**: Optimize to under 200 KB
+3. **Aspect Ratios**: Use 2.5:1 for Swiggy/Blinkit style banners
+4. **Animations**: Prefer RIVE for performance-critical banners
+5. **Error Handling**: Always handle loading and error states
+6. **Type Safety**: Use TypeScript types for type checking
+7. **Analytics**: Track banner impressions and clicks
+8. **Testing**: Test on all platforms (iOS, Android, Web)
 
 ---
 
 ## Quick Reference
 
-### Transparent Banner Cheat Sheet
+### Banner Format Cheat Sheet
 
 ```typescript
-// ✅ Fully transparent (shows gradient)
-background: { type: 'solid', config: { color: 'transparent' } }
+// ✅ Static image banner
+banner: {
+  type: 'image',
+  url: 'https://example.com/banner.png',
+  aspectRatio: 2.5
+}
 
-// ✅ Semi-transparent dark overlay
-background: { type: 'solid', config: { color: 'rgba(0, 0, 0, 0.2)' } }
+// ✅ Rive animation (recommended)
+banner: {
+  type: 'rive',
+  url: 'https://example.com/banner.riv',
+  aspectRatio: 16 / 9
+}
 
-// ✅ Semi-transparent white (glassmorphism)
-background: { type: 'solid', config: { color: 'rgba(255, 255, 255, 0.15)' } }
+// ✅ Lottie animation
+banner: {
+  type: 'lottie',
+  url: 'https://example.com/banner.json'
+}
 
-// ✅ Fully transparent (alternative)
-background: { type: 'solid', config: { color: 'rgba(0, 0, 0, 0)' } }
-
-// ❌ Wrong - this will show as solid red
-background: { type: 'solid', config: { color: '#EC0505' } }
+// ❌ Old format (deprecated)
+banners: [
+  {
+    id: 'banner1',
+    content: { title: 'Title', ... },
+    // ... complex structure
+  }
+]
 ```
 
-### Common Color Values
-
-| Use Case | Color Value | Effect |
-|----------|-------------|--------|
-| Fully transparent | `'transparent'` | Shows main gradient |
-| Fully transparent (alt) | `'rgba(0, 0, 0, 0)'` | Shows main gradient |
-| Subtle dark overlay | `'rgba(0, 0, 0, 0.1)'` | 10% black tint |
-| Medium dark overlay | `'rgba(0, 0, 0, 0.3)'` | 30% black tint |
-| Frosted glass (dark) | `'rgba(0, 0, 0, 0.15)'` | Glassmorphism effect |
-| Frosted glass (light) | `'rgba(255, 255, 255, 0.15)'` | Light glass effect |
-| White overlay | `'rgba(255, 255, 255, 0.2)'` | 20% white tint |
-
-### Section Backgrounds
+### Search Placeholders Format
 
 ```typescript
-// All sections transparent (show main gradient)
-sectionBackgrounds: {
-  toolbar: null,
-  searchBar: null,
-  tabNavigation: null,
-}
+// ✅ Correct format
+searchPlaceholders: ['ice-cream', 'vegetables', 'snacks']
 
-// Toolbar with overlay, others transparent
-sectionBackgrounds: {
-  toolbar: { type: 'solid', config: { color: 'rgba(0, 0, 0, 0.1)' } },
-  searchBar: null,
-  tabNavigation: null,
-}
+// ❌ Old format (deprecated)
+searchPlaceholders: ['Search "ice-cream"', 'Search "vegetables"']
 ```
 
 ---
 
 ## Troubleshooting
 
-### Issue: Gradient not showing
-**Solution**: Ensure `expo-linear-gradient` is installed and `backgroundGradient` has at least 2 colors.
+### Banner not showing
 
-### Issue: Section backgrounds not transparent
-**Solution**: Explicitly set section background colors to `'transparent'` or omit them entirely (they default to transparent).
+**Solution**: Ensure you're using the new `banner` (singular) field, not `banners` (array).
 
-### Issue: Tab separator has gap
-**Solution**: Check that `tabScrollContent.paddingBottom` is `0` and tab indicator is positioned at `bottom: 0`.
+### Typewriter animation not working
 
-### Issue: Custom background component not visible
-**Solution**: Ensure the custom component has `position: 'absolute'` and covers the full area with `StyleSheet.absoluteFillObject`.
+**Solution**: Check that placeholders are just words without "Search" prefix or quotes.
 
-### Issue: Icons not showing in tabs
-**Solution**: Verify that icon URLs are valid and accessible. Check network tab for failed image requests.
+### Animation placeholder showing
 
-### Issue: Changes to mock data not reflecting in app
-**Solution**:
-1. Clear Metro bundler cache: Kill the dev server and restart
-2. Reload the app (shake device → Reload, or press 'r' in terminal)
-3. Verify you're editing the correct file in `src/mocks/api/homeHeader.ts`
+**Solution**: Rive/Lottie integration is pending. Currently shows placeholder text for animation types.
 
-### Issue: Banner background showing solid color instead of transparent
-**Solution**: Use `color: 'transparent'` instead of a hex color. See [Transparent Backgrounds](#transparent-backgrounds) section.
+### Performance issues with banner
+
+**Solution**: Switch from Lottie to Rive for 3.5x better performance.
 
 ---
 
@@ -990,87 +606,39 @@ sectionBackgrounds: {
 - `expo-router`: ^6.x.x
 - `react-native-safe-area-context`: ^4.x.x
 
----
-
-## Migration to Real API
-
-When transitioning to a real backend API:
-
-1. **Update the fetch function:**
-
-```typescript
-// Before (mock)
-import { fetchHomeHeader } from '@/mocks';
-
-// After (real API)
-import { fetchHomeHeader } from '@/api/homeHeader';
-```
-
-2. **Keep the same interface:**
-
-Your real API should return the same `HomeHeaderApiResponse` structure.
-
-3. **No component changes needed:**
-
-The `transformHomeHeaderData` utility and component integration remain the same.
-
-### Example Real API Implementation
-
-```typescript
-// api/homeHeader.ts
-export async function fetchHomeHeader(params?: {
-  userId?: string;
-  location?: { lat: number; lng: number };
-}): Promise<HomeHeaderApiResponse> {
-  const response = await fetch('/api/v1/home/header', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
-    },
-    body: JSON.stringify(params),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch home header');
-  }
-
-  return response.json();
-}
-```
-
----
-
-## Related Documentation
-
-- [Sushi Design System](./DESIGN_SYSTEM.md)
-- [Architecture Overview](./ARCHITECTURE.md)
-- [API Integration Guide](./API_INTEGRATION.md)
+**Optional (for animations):**
+- `rive-react-native`: For Rive animations
+- `lottie-react-native`: For Lottie animations
 
 ---
 
 ## Changelog
 
+### v1.3.0 (2024-12-04)
+- **BREAKING**: Simplified banner from array to single object
+- **BREAKING**: Changed API field from `banners[]` to `banner`
+- **NEW**: Support for Rive and Lottie animations in banner
+- **NEW**: Customizable aspect ratio for banner
+- **REMOVED**: Banner title, subtitle, and CTA buttons
+- **REMOVED**: Multiple banners and priority system
+
+### v1.2.0 (2024-12-04)
+- **BREAKING**: Changed search placeholder format (no "Search" prefix)
+- **NEW**: Custom typewriter effect for search placeholders
+- **REMOVED**: ViewFlipper dependency
+- **IMPROVED**: Cross-platform compatibility (iOS, Android, Web)
+- **IMPROVED**: Search placeholder animation smoothness
+
 ### v1.1.0 (2024-12-03)
 - **NEW**: Animated sliding tab indicator with spring physics
-- **NEW**: Smooth tab transitions using React Native Animated API
-- **NEW**: Dynamic indicator width adjustment for different tab sizes
-- **IMPROVED**: Tab icon size reduced by 40% for better proportions
+- **NEW**: Dynamic indicator width adjustment
 
 ### v1.0.0 (2024-12-03)
-- Initial implementation with unified background container
-- Gradient, image, and animation support
-- Section-specific background overlays
-- Tab navigation with icons and active indicator
-- Animated search placeholders with ViewFlipper
-- Promotional banner integration with transparent support
-- Mock API with comprehensive types and hooks
-- Transform utilities for API-to-props conversion
-- Multiple mock scenarios for testing
+- Initial implementation
 
 ---
 
-**Last Updated**: December 3, 2024
-**Component Version**: 1.1.0
-**API Version**: 1.0.0
+**Last Updated**: December 4, 2024
+**Component Version**: 1.3.0
+**API Version**: 2.0.0
 **Status**: Production Ready (Mock API)
