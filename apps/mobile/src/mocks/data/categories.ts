@@ -1,0 +1,68 @@
+import { Category } from 'shared-types';
+
+export const mockCategories: Category[] = [
+  {
+    id: 'cat-1',
+    name: 'Fruits & Vegetables',
+    slug: 'fruits-vegetables',
+    image: 'https://raw.githubusercontent.com/sidextron92/random_assets/refs/heads/main/footwear_pressed.png',
+    parentId: null,
+    sortOrder: 1,
+  },
+  {
+    id: 'cat-2',
+    name: 'Dairy & Breakfast',
+    slug: 'dairy-breakfast',
+    image: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=200',
+    parentId: null,
+    sortOrder: 2,
+  },
+  {
+    id: 'cat-3',
+    name: 'Snacks & Beverages',
+    slug: 'snacks-beverages',
+    image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=200',
+    parentId: null,
+    sortOrder: 3,
+  },
+  {
+    id: 'cat-4',
+    name: 'Instant Food',
+    slug: 'instant-food',
+    image: 'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=200',
+    parentId: null,
+    sortOrder: 4,
+  },
+  {
+    id: 'cat-5',
+    name: 'Personal Care',
+    slug: 'personal-care',
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200',
+    parentId: null,
+    sortOrder: 5,
+  },
+  {
+    id: 'cat-6',
+    name: 'Home & Kitchen',
+    slug: 'home-kitchen',
+    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200',
+    parentId: null,
+    sortOrder: 6,
+  },
+  {
+    id: 'cat-7',
+    name: 'Baby Care',
+    slug: 'baby-care',
+    image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=200',
+    parentId: null,
+    sortOrder: 7,
+  },
+  {
+    id: 'cat-8',
+    name: 'Pet Care',
+    slug: 'pet-care',
+    image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200',
+    parentId: null,
+    sortOrder: 8,
+  },
+];
