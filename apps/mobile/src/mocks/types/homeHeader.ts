@@ -119,9 +119,25 @@ export interface TabBadge {
 }
 
 // ============================================================================
-// Promotional Banner Types
+// Promotional Banner Types (Simplified - Single Full-Width Banner)
 // ============================================================================
 
+export type BannerType = 'image' | 'rive' | 'lottie';
+
+export interface SimpleBanner {
+  /** Type of banner content */
+  type: BannerType;
+  /** URL to image or animation file */
+  url: string;
+  /** Aspect ratio (width/height) for banner */
+  aspectRatio?: number;
+  /** Navigation target on tap */
+  target?: NavigationTarget;
+  /** Analytics tracking */
+  analytics?: AnalyticsData;
+}
+
+// Legacy banner types for backward compatibility (deprecated)
 export interface PromotionalBanner {
   id: string;
   priority: number;
@@ -224,7 +240,10 @@ export interface HomeHeaderApiResponse {
   search: SearchConfig;
   user: UserInfo;
   tabs: TabsConfig;
-  banners: PromotionalBanner[];
+  /** Single promotional banner (new simplified format) */
+  banner?: SimpleBanner;
+  /** Legacy banners array (deprecated, use 'banner' instead) */
+  banners?: PromotionalBanner[];
   metadata?: ApiMetadata;
 }
 

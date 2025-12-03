@@ -68,13 +68,16 @@ export function transformHomeHeaderData(
       })),
     initialSelectedTab: apiData.tabs.selectedTabId,
 
-    // Promotional banner (use first banner for now, carousel support later)
-    promotionalBanner: apiData.banners.length > 0
+    // Promotional banner (single simplified format)
+    promotionalBanner: apiData.banner
       ? {
-          ...transformBackground(apiData.banners[0].background),
-          title: apiData.banners[0].content.title,
-          subtitle: apiData.banners[0].content.subtitle,
-          imageUri: apiData.banners[0].content.imageUrl || undefined,
+          imageUri: apiData.banner.type === 'image' ? apiData.banner.url : undefined,
+          animationUri: apiData.banner.type !== 'image' ? apiData.banner.url : undefined,
+          animationType: apiData.banner.type !== 'image' ? apiData.banner.type : undefined,
+          aspectRatio: apiData.banner.aspectRatio,
+          onPress: apiData.banner.target
+            ? () => callbacks?.onBannerClick?.(apiData.banner!.url, apiData.banner!.target)
+            : undefined,
         }
       : undefined,
 

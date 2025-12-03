@@ -48,16 +48,18 @@ export interface HomeHeaderProps {
   userAvatarUri?: string;
   /** Search placeholder words to cycle through (e.g., ["ice-cream", "vegetables"]) */
   searchPlaceholders?: string[];
-  /** Promotional banner data */
+  /** Promotional banner - single full-width image or animation */
   promotionalBanner?: {
-    /** Banner background color (transparent by default, overlays main background) */
-    backgroundColor?: string;
-    /** Banner title */
-    title?: string;
-    /** Banner subtitle/date */
-    subtitle?: string;
-    /** Banner image URI */
+    /** Image URI for static banner */
     imageUri?: string;
+    /** Animation file URI (Rive/Lottie) */
+    animationUri?: string;
+    /** Animation type */
+    animationType?: 'rive' | 'lottie';
+    /** Banner aspect ratio (width/height) - defaults to 16:9 */
+    aspectRatio?: number;
+    /** OnPress callback for banner tap */
+    onPress?: () => void;
   };
   /** Category tabs for navigation */
   categoryTabs?: CategoryTab[];
@@ -401,43 +403,40 @@ export function HomeHeader({
         </Animated.View>
       )}
 
-      {/* Promotional Banner */}
-      {promotionalBanner && (
+      {/* Promotional Banner - Full Width Image or Animation */}
+      {promotionalBanner && (promotionalBanner.imageUri || promotionalBanner.animationUri) && (
         <Animated.View
           style={[
             styles.promotionalBanner,
-            { backgroundColor: promotionalBanner.backgroundColor || 'transparent' },
             bannerAnimatedHeight && { height: bannerAnimatedHeight },
             bannerAnimatedOpacity && { opacity: bannerAnimatedOpacity },
           ]}
         >
-          <View style={styles.bannerContent}>
-            {promotionalBanner.title && (
-              <SushiText
-                variant="h2"
-                customColor="#FFFFFF"
-                style={styles.bannerTitle}
-              >
-                {promotionalBanner.title}
-              </SushiText>
-            )}
-            {promotionalBanner.subtitle && (
-              <SushiText
-                variant="caption"
-                customColor="#FFFFFF"
-                style={styles.bannerSubtitle}
-              >
-                {promotionalBanner.subtitle}
-              </SushiText>
-            )}
-          </View>
-          {promotionalBanner.imageUri && (
-            <Image
-              source={{ uri: promotionalBanner.imageUri }}
-              style={styles.bannerImage}
-              resizeMode="contain"
-            />
-          )}
+          <Pressable
+            style={styles.bannerPressable}
+            onPress={promotionalBanner.onPress}
+            disabled={!promotionalBanner.onPress}
+          >
+            {promotionalBanner.imageUri ? (
+              <Image
+                source={{ uri: promotionalBanner.imageUri }}
+                style={[
+                  styles.bannerFullImage,
+                  promotionalBanner.aspectRatio
+                    ? { aspectRatio: promotionalBanner.aspectRatio }
+                    : undefined,
+                ]}
+                resizeMode="cover"
+              />
+            ) : promotionalBanner.animationUri ? (
+              <View style={styles.bannerAnimationContainer}>
+                <SushiText variant="caption" customColor="#666">
+                  Animation placeholder: {promotionalBanner.animationType || 'rive'}
+                </SushiText>
+                {/* TODO: Add Rive/Lottie component here */}
+              </View>
+            ) : null}
+          </Pressable>
         </Animated.View>
       )}
     </View>
@@ -518,31 +517,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   promotionalBanner: {
-    flexDirection: 'row',
+    width: '100%',
+    overflow: 'hidden',
+  },
+  bannerPressable: {
+    width: '100%',
+  },
+  bannerFullImage: {
+    width: '100%',
+    aspectRatio: 16 / 9, // Default 16:9 aspect ratio
+  },
+  bannerAnimationContainer: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    minHeight: 80,
-  },
-  bannerContent: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    lineHeight: 32,
-    marginBottom: 4,
-  },
-  bannerSubtitle: {
-    fontSize: 11,
-    lineHeight: 16,
-    opacity: 0.9,
-  },
-  bannerImage: {
-    width: 120,
-    height: 60,
-    marginLeft: 16,
+    justifyContent: 'center',
   },
   tabNavigationContainer: {
     position: 'relative',
@@ -566,8 +556,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   tabIconImage: {
-    width: 28.8,  // 40% reduction from 48px
-    height: 28.8,
+    width: 24,  // 40% reduction from 48px
+    height: 24,
     marginBottom: 4,
   },
   tabLabel: {

@@ -102,7 +102,7 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
       },
       {
         id: 'accessories',
-        label: 'ACCESSORIES',
+        label: 'Accessories',
         icon: {
           default: 'https://github.com/sidextron92/random_assets/blob/main/accessory_unpressed.png?raw=true',
           pressed: 'https://github.com/sidextron92/random_assets/blob/main/accessory_pressed.png?raw=true',
@@ -151,127 +151,33 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
     ],
   },
 
-  banners: [
+  banner: {
     /**
-     * Banner Background Options:
+     * Single promotional banner - full-width image or animation
      *
-     * 1. Transparent (shows main gradient):
-     *    color: 'transparent'
-     *
-     * 2. Semi-transparent overlay:
-     *    color: 'rgba(0, 0, 0, 0.2)'  // 20% dark overlay
-     *
-     * 3. Glassmorphism:
-     *    color: 'rgba(255, 255, 255, 0.15)'  // Frosted glass
-     *
-     * 4. Solid color:
-     *    color: '#EC0505'  // Red background
+     * Options:
+     * 1. Static image banner
+     * 2. Rive animation (recommended for interactive content)
+     * 3. Lottie animation (for simple pre-rendered animations)
      */
-    {
-      id: 'housefull-deals',
-      priority: 1,
-      background: {
-        type: 'solid',
-        config: {
-          color: 'transparent',  // Transparent - shows main gradient
+    type: 'image', // 'image' | 'rive' | 'lottie'
+    url: 'https://github.com/sidextron92/random_assets/blob/main/bijnis_mascot.png?raw=true',
+    aspectRatio: 16 / 9, // Width/Height ratio
+    target: {
+      type: 'screen',
+      config: {
+        screen: 'CategoryScreen',
+        params: {
+          category: 'special-offers',
+          campaign: 'housefull-deals',
         },
-      },
-      content: {
-        title: 'Housefull Deals',
-        subtitle: '20th Nov, 2024 - 7th Dec, 2024',
-        imageUrl: 'https://via.placeholder.com/120x60/058234/FFFFFF?text=Deals',
-      },
-      cta: {
-        text: 'Shop Now',
-        style: 'primary',
-      },
-      target: {
-        type: 'screen',
-        config: {
-          screen: 'CategoryScreen',
-          params: {
-            category: 'special-offers',
-            campaign: 'housefull-deals',
-          },
-        },
-      },
-      analytics: {
-        impressionTrackingId: 'banner_housefull_impression',
-        clickTrackingId: 'banner_housefull_click',
       },
     },
-    {
-      id: 'winter-collection',
-      priority: 2,
-      background: {
-        type: 'gradient',
-        config: {
-          colors: ['#1E3A8A', '#3B82F6'],
-          start: { x: 0, y: 0 },
-          end: { x: 1, y: 1 },
-          type: 'linear',
-        },
-      },
-      content: {
-        title: 'Winter Collection',
-        subtitle: 'Stay warm this season',
-        imageUrl: 'https://via.placeholder.com/120x60/1E3A8A/FFFFFF?text=Winter',
-      },
-      cta: {
-        text: 'Explore',
-        style: 'secondary',
-      },
-      target: {
-        type: 'screen',
-        config: {
-          screen: 'CategoryScreen',
-          params: {
-            category: 'winter-wear',
-            season: 'winter-2024',
-          },
-        },
-      },
-      analytics: {
-        impressionTrackingId: 'banner_winter_impression',
-        clickTrackingId: 'banner_winter_click',
-      },
+    analytics: {
+      impressionTrackingId: 'banner_housefull_impression',
+      clickTrackingId: 'banner_housefull_click',
     },
-    {
-      id: 'fresh-arrivals',
-      priority: 3,
-      background: {
-        type: 'image',
-        config: {
-          url: 'https://via.placeholder.com/600x200/4CAF50/FFFFFF?text=Fresh+Arrivals',
-          resizeMode: 'cover',
-          opacity: 0.9,
-        },
-      },
-      content: {
-        title: 'Fresh Arrivals',
-        subtitle: 'New products every day',
-        imageUrl: null,
-      },
-      cta: {
-        text: 'View All',
-        style: 'ghost',
-      },
-      target: {
-        type: 'screen',
-        config: {
-          screen: 'CategoryScreen',
-          params: {
-            category: 'new-arrivals',
-            sortBy: 'newest',
-          },
-        },
-      },
-      analytics: {
-        impressionTrackingId: 'banner_fresh_impression',
-        clickTrackingId: 'banner_fresh_click',
-      },
-    },
-  ],
+  },
 
   metadata: {
     lastUpdated: new Date().toISOString(),
@@ -286,7 +192,7 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
  * @param params - Optional parameters for personalization
  * @returns Promise with home header data
  */
-export async function fetchHomeHeader(params?: {
+export async function fetchHomeHeader(_params?: {
   userId?: string;
   location?: { lat: number; lng: number };
 }): Promise<HomeHeaderApiResponse> {
@@ -296,8 +202,8 @@ export async function fetchHomeHeader(params?: {
   // In a real implementation, this would:
   // 1. Fetch data from the backend API
   // 2. Apply personalization based on user preferences
-  // 3. Filter banners based on scheduling/targeting
-  // 4. Apply A/B testing variants
+  // 3. Apply A/B testing variants
+  // 4. Dynamically serve appropriate banner content
 
   // For now, return mock data
   return mockHomeHeaderData;
@@ -353,11 +259,42 @@ export const mockScenarios = {
   },
 
   /**
-   * No promotional banners
+   * No promotional banner
    */
-  noBanners: {
+  noBanner: {
     ...mockHomeHeaderData,
-    banners: [],
+    banner: undefined,
+  },
+
+  /**
+   * Rive animation banner example
+   */
+  riveBanner: {
+    ...mockHomeHeaderData,
+    banner: {
+      type: 'rive' as const,
+      url: 'https://example.com/banner-animation.riv',
+      aspectRatio: 2.5,
+      target: {
+        type: 'screen' as const,
+        config: {
+          screen: 'CategoryScreen',
+          params: { category: 'offers' },
+        },
+      },
+    },
+  },
+
+  /**
+   * Lottie animation banner example
+   */
+  lottieBanner: {
+    ...mockHomeHeaderData,
+    banner: {
+      type: 'lottie' as const,
+      url: 'https://example.com/banner-animation.json',
+      aspectRatio: 16 / 9,
+    },
   },
 
   /**
