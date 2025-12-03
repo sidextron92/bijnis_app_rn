@@ -50,11 +50,11 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
 
   search: {
     placeholders: [
-      'Search "ice-cream"',
-      'Search "vegetables"',
-      'Search "snacks"',
-      'Search "dairy products"',
-      'Search "fresh fruits"',
+      'ice-cream',
+      'vegetables',
+      'snacks',
+      'dairy products',
+      'fresh fruits',
     ],
     voiceEnabled: true,
   },

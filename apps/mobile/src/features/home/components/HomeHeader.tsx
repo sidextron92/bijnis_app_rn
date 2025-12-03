@@ -3,8 +3,9 @@ import { View, StyleSheet, Pressable, Image, ScrollView, ImageBackground, Animat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { SushiText, SushiAvatar, SushiViewFlipper } from 'design-system';
+import { SushiText, SushiAvatar } from 'design-system';
 import { LinearGradient } from 'expo-linear-gradient';
+import { TypewriterText } from '../../../components/TypewriterText';
 
 export interface CategoryTab {
   /** Tab ID */
@@ -45,7 +46,7 @@ export interface HomeHeaderProps {
   userInitials?: string;
   /** User avatar image URI */
   userAvatarUri?: string;
-  /** Search placeholder items to cycle through */
+  /** Search placeholder words to cycle through (e.g., ["ice-cream", "vegetables"]) */
   searchPlaceholders?: string[];
   /** Promotional banner data */
   promotionalBanner?: {
@@ -81,9 +82,9 @@ export interface HomeHeaderProps {
 }
 
 const DEFAULT_SEARCH_PLACEHOLDERS = [
-  'Search "ice-cream"',
-  'Search "vegetables"',
-  'Search "snacks"',
+  'ice-cream',
+  'vegetables',
+  'snacks',
 ];
 
 /**
@@ -309,19 +310,13 @@ export function HomeHeader({
         >
           <Ionicons name="search" size={16} color="#9C9C9C" />
           <View style={styles.searchPlaceholderContainer}>
-            <SushiViewFlipper
-              count={searchPlaceholders.length}
-              flipInterval={3000}
-              animationDuration={600}
-              renderItem={(index) => (
-                <SushiText
-                  variant="body"
-                  customColor="#9C9C9C"
-                  style={styles.searchPlaceholder}
-                >
-                  {searchPlaceholders[index]}
-                </SushiText>
-              )}
+            <TypewriterText
+              words={searchPlaceholders}
+              color="#9C9C9C"
+              speed={100}
+              deleteSpeed={50}
+              delayBetween={2000}
+              style={styles.searchPlaceholder}
             />
           </View>
           <View style={styles.searchDivider} />
@@ -475,10 +470,10 @@ const styles = StyleSheet.create({
   deliveryLabel: {
     fontSize: 12,
     lineHeight: 12,
-    marginBottom: 0,
+    marginBottom: 4,
   },
   deliveryTime: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
     lineHeight: 25,
   },

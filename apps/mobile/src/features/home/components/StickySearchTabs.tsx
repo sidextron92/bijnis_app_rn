@@ -3,11 +3,12 @@ import { View, StyleSheet, Pressable, Image, ScrollView, Animated } from 'react-
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { SushiText, SushiViewFlipper } from 'design-system';
+import { SushiText } from 'design-system';
 import { CategoryTab } from './HomeHeader';
+import { TypewriterText } from '../../../components/TypewriterText';
 
 interface StickySearchTabsProps {
-  /** Search placeholder items to cycle through */
+  /** Search placeholder words to cycle through (e.g., ["ice-cream", "vegetables"]) */
   searchPlaceholders?: string[];
   /** Category tabs for navigation */
   categoryTabs?: CategoryTab[];
@@ -58,19 +59,13 @@ export function StickySearchTabs({
         <Pressable style={styles.searchBar} onPress={handleSearchPress}>
           <Ionicons name="search" size={16} color="#9C9C9C" />
           <View style={styles.searchPlaceholderContainer}>
-            <SushiViewFlipper
-              count={searchPlaceholders.length}
-              flipInterval={3000}
-              animationDuration={600}
-              renderItem={(index) => (
-                <SushiText
-                  variant="body"
-                  customColor="#9C9C9C"
-                  style={styles.searchPlaceholder}
-                >
-                  {searchPlaceholders[index]}
-                </SushiText>
-              )}
+            <TypewriterText
+              words={searchPlaceholders}
+              color="#9C9C9C"
+              speed={100}
+              deleteSpeed={50}
+              delayBetween={2000}
+              style={styles.searchPlaceholder}
             />
           </View>
           <View style={styles.searchDivider} />
