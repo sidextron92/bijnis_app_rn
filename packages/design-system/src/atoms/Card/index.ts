@@ -5,3 +5,6 @@ export {
   SushiCardContent as CardContent,
   SushiCardFooter as CardFooter,
 } from './SushiCard';
+
+export * from './ProductCard';
+export { ProductCard } from './ProductCard';

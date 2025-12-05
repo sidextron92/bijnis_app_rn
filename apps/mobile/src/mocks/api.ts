@@ -8,6 +8,7 @@ import { mockProducts } from './data/products';
 import { mockUser, mockAddresses, validTestPhones, TEST_OTP } from './data/users';
 import { mockOrders } from './data/orders';
 import { mockHomeLayout } from './data/homeLayout';
+import { mockProductGridItems, type ProductGridItem } from './data/productGrid';
 import type {
   User,
   Product,
@@ -425,6 +426,10 @@ export const homeApi = {
   async getHomeLayout(): Promise<MockResponse<SDUIPageLayout>> {
     await randomDelay(300, 600);
     return success(mockHomeLayout);
+  },
+  async getProductList(): Promise<MockResponse<ProductGridItem[]>> {
+    await randomDelay(300, 600);
+    return success(mockProductGridItems);
   },
 };
 

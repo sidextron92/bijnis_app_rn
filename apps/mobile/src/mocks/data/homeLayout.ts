@@ -159,5 +159,31 @@ export const mockHomeLayout: SDUIPageLayout = {
         viewAllAction: { type: 'navigate', destination: '/category/cat-1' },
       },
     },
+
+    // Spacer before product grid
+    {
+      type: 'spacer',
+      data: {
+        height: 16,
+      },
+    },
+
+    // Product Grid Section
+    {
+      type: 'product_grid',
+      data: {
+        title: 'Popular Products',
+        columns: 2,
+        gap: 16,
+      },
+    },
+
+    // Bottom spacer
+    {
+      type: 'spacer',
+      data: {
+        height: 32,
+      },
+    },
   ],
 };
