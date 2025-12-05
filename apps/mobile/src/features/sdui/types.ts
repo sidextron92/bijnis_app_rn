@@ -39,6 +39,16 @@ export interface ProductRailData {
     price: number;
     mrp: number;
     unit: string;
+    // Full product details
+    category?: string;
+    categoryColorScheme?: 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info';
+    productType?: string;
+    location?: string;
+    moq?: string;
+    stockWarning?: string;
+    deliveryTime?: string;
+    margin?: string;
+    variants?: Array<{ id: string; color: string }>;
   }>;
   seeAllLink?: string;
 }

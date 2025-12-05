@@ -1,28 +1,57 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, Image } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, StyleSheet, FlatList, Pressable, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCart, selectItemQuantity, incrementQuantity, decrementQuantity } from '@/features/cart/store/cartSlice';
 import type { ProductRailProps } from '../../types';
-import { useTheme } from 'design-system';
+import {
+  useTheme,
+  ProductCard,
+  SushiText,
+  ProductDetailBottomSheet,
+} from 'design-system';
 import { spacing } from '@/theme/spacing';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_MARGIN = 12;
+const HORIZONTAL_PADDING = 16;
+// Calculate card width: (screenWidth - 2*padding - 2*margin) / 2.25 (to show 2 full cards + 1/4 of 3rd)
+const CARD_WIDTH = (SCREEN_WIDTH - HORIZONTAL_PADDING * 2 - CARD_MARGIN * 2) / 2.25;
 
 export function ProductRail({ title, products, seeAllLink }: ProductRailProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme.colors), [theme.colors]);
+  const [selectedProduct, setSelectedProduct] = useState<ProductRailProps['products'][0] | null>(null);
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
 
   if (!products || products.length === 0) {
     return null;
   }
 
+  const handleAddPress = (product: ProductRailProps['products'][0]) => {
+    setSelectedProduct(product);
+    setBottomSheetVisible(true);
+  };
+
+  const handleAddItems = (selections: Record<string, number>) => {
+    console.log('Add to cart:', {
+      product: selectedProduct,
+      selections,
+    });
+    // TODO: Implement add to cart logic
+    setBottomSheetVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
+        <SushiText variant="heading3" customColor={theme.colors.text.primary}>
+          {title}
+        </SushiText>
         {seeAllLink && (
           <Pressable onPress={() => router.push(seeAllLink as any)}>
-            <Text style={styles.seeAll}>See All</Text>
+            <SushiText variant="body" customColor={theme.colors.interactive.primary} style={styles.seeAll}>
+              See All
+            </SushiText>
           </Pressable>
         )}
       </View>
@@ -33,90 +62,118 @@ export function ProductRail({ title, products, seeAllLink }: ProductRailProps) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.list}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => <ProductCard product={item} styles={styles} colors={theme.colors} />}
+        renderItem={({ item }) => (
+          <ProductCardWrapper product={item} onAddPress={() => handleAddPress(item)} />
+        )}
       />
+
+      {/* Product Detail Bottom Sheet */}
+      {selectedProduct && (
+        <ProductDetailBottomSheet
+          visible={bottomSheetVisible}
+          onDismissRequest={() => setBottomSheetVisible(false)}
+          productInfo={{
+            imageSource: { uri: selectedProduct.image },
+            colorIndicator: selectedProduct.variants?.[0]?.color,
+            colorName: selectedProduct.variants?.[0]?.id,
+            sizeInfo: selectedProduct.category || 'Standard Sizes',
+            price: `₹${selectedProduct.price}`,
+            priceNote: selectedProduct.mrp > selectedProduct.price ? `MRP ₹${selectedProduct.mrp}` : undefined,
+          }}
+          sizeGuide={{
+            rowLabels: ['Length (Inch)', 'Chest (Inch)'],
+            sizeColumns: [
+              { size: 'S', values: ['24', '34'] },
+              { size: 'M', values: ['24', '34'] },
+              { size: 'L', values: ['24', '34'] },
+              { size: 'XL', values: ['24', '34'] },
+              { size: 'XXL', values: ['24', '34'] },
+              { size: 'XXXL', values: ['24', '34'] },
+            ],
+            footerNote: '**0.75 +/- inches may vary on physical product due to wash/shrinkage**',
+          }}
+          deliveryOptions={[
+            {
+              id: 'express',
+              variant: 'express',
+              deliveryTitle: '60 Min Delivery',
+              icon: '🚀',
+              sizeSets: [
+                {
+                  sizeSet: '7/2, 8/1, 9/1',
+                  description: '4 Pairs per size set',
+                  quantity: 0,
+                },
+                {
+                  sizeSet: '7/2, 8/2',
+                  description: '4 Pairs per size set',
+                  extraPrice: 'Extra price: ₹ 5/pair',
+                  quantity: 0,
+                },
+              ],
+            },
+            {
+              id: 'prebook',
+              variant: 'prebook',
+              deliveryTitle: 'Pre Book: Delivery by 15 Oct',
+              icon: '🕐',
+              sizeSets: [
+                {
+                  sizeSet: '7/2, 8/1, 9/1',
+                  description: '4 Pairs per size set',
+                  quantity: 0,
+                },
+                {
+                  sizeSet: '7/2, 8/2',
+                  description: '4 Pairs per size set',
+                  extraPrice: 'Extra price: ₹ 5/pair',
+                  quantity: 0,
+                },
+              ],
+            },
+          ]}
+          showSizeGuide={true}
+          onAddItems={handleAddItems}
+        />
+      )}
     </View>
   );
 }
 
-interface ProductCardProps {
+interface ProductCardWrapperProps {
   product: ProductRailProps['products'][0];
-  styles: ReturnType<typeof createStyles>;
-  colors: ReturnType<typeof useTheme>['theme']['colors'];
+  onAddPress: () => void;
 }
 
-function ProductCard({ product, styles, colors }: ProductCardProps) {
+function ProductCardWrapper({ product, onAddPress }: ProductCardWrapperProps) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const quantity = useAppSelector(selectItemQuantity(product.id));
-
-  const discount = product.mrp > product.price
-    ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
-    : 0;
 
   const handlePress = () => {
     router.push(`/(main)/product/${product.id}`);
   };
 
-  const handleAddToCart = () => {
-    dispatch(addToCart({
-      id: product.id,
-      name: product.name,
-      images: [product.image],
-      sellingPrice: product.price,
-      mrp: product.mrp,
-      unit: product.unit,
-    } as any));
-  };
-
-  const handleIncrement = () => {
-    dispatch(incrementQuantity(product.id));
-  };
-
-  const handleDecrement = () => {
-    dispatch(decrementQuantity(product.id));
-  };
-
+  // Pass all product details to ProductCard
   return (
-    <Pressable style={styles.card} onPress={handlePress}>
-      {discount > 0 && (
-        <View style={styles.discountBadge}>
-          <Text style={styles.discountText}>{discount}% OFF</Text>
-        </View>
-      )}
-
-      <Image source={{ uri: product.image }} style={styles.image} />
-
-      <View style={styles.cardContent}>
-        <Text style={styles.productName} numberOfLines={2}>
-          {product.name}
-        </Text>
-        <Text style={styles.unit}>{product.unit}</Text>
-
-        <View style={styles.priceRow}>
-          <Text style={styles.price}>₹{product.price}</Text>
-          {product.mrp > product.price && (
-            <Text style={styles.mrp}>₹{product.mrp}</Text>
-          )}
-        </View>
-
-        {quantity === 0 ? (
-          <Pressable style={styles.addButton} onPress={handleAddToCart}>
-            <Text style={styles.addButtonText}>ADD</Text>
-          </Pressable>
-        ) : (
-          <View style={styles.quantityContainer}>
-            <Pressable style={styles.qtyButton} onPress={handleDecrement}>
-              <Text style={styles.qtyButtonText}>-</Text>
-            </Pressable>
-            <Text style={styles.qty}>{quantity}</Text>
-            <Pressable style={styles.qtyButton} onPress={handleIncrement}>
-              <Text style={styles.qtyButtonText}>+</Text>
-            </Pressable>
-          </View>
-        )}
-      </View>
-    </Pressable>
+    <View style={{ marginRight: CARD_MARGIN }}>
+      <ProductCard
+        category={product.category}
+        categoryColorScheme={product.categoryColorScheme}
+        productType={product.productType}
+        title={product.name}
+        location={product.location}
+        moq={product.moq}
+        stockWarning={product.stockWarning}
+        deliveryTime={product.deliveryTime}
+        margin={product.margin}
+        price={String(product.price)}
+        mrp={product.mrp > product.price ? String(product.mrp) : undefined}
+        imageSource={{ uri: product.image }}
+        variants={product.variants}
+        onPress={handlePress}
+        onAddPress={onAddPress}
+        width={CARD_WIDTH}
+      />
+    </View>
   );
 }
 
@@ -130,114 +187,19 @@ const createStyles = (colors: ReturnType<typeof useTheme>['theme']['colors']) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: HORIZONTAL_PADDING,
       marginBottom: spacing.md,
     },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors.text.primary,
-    },
     seeAll: {
-      fontSize: 14,
-      color: colors.interactive.primary,
       fontWeight: '500',
     },
     list: {
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: HORIZONTAL_PADDING,
     },
-    card: {
-      width: 140,
-      marginRight: spacing.md,
-      backgroundColor: colors.surface.default,
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: colors.border.default,
-      overflow: 'hidden',
+    bottomSheetContent: {
+      flex: 1,
     },
-    discountBadge: {
-      position: 'absolute',
-      top: 8,
-      left: 8,
-      backgroundColor: colors.background.success,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: 4,
-      zIndex: 1,
-    },
-    discountText: {
-      color: colors.text.inverse,
-      fontSize: 10,
-      fontWeight: '600',
-    },
-    image: {
-      width: '100%',
-      height: 120,
-      backgroundColor: colors.background.tertiary,
-    },
-    cardContent: {
-      padding: spacing.sm,
-    },
-    productName: {
-      fontSize: 12,
-      color: colors.text.primary,
-      marginBottom: spacing.xs,
-      height: 32,
-    },
-    unit: {
-      fontSize: 10,
-      color: colors.text.secondary,
-      marginBottom: spacing.xs,
-    },
-    priceRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: spacing.sm,
-    },
-    price: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.text.primary,
-    },
-    mrp: {
-      fontSize: 11,
-      color: colors.text.secondary,
-      textDecorationLine: 'line-through',
-      marginLeft: spacing.xs,
-    },
-    addButton: {
-      backgroundColor: colors.surface.default,
-      borderWidth: 1,
-      borderColor: colors.interactive.primary,
-      borderRadius: 6,
-      paddingVertical: spacing.xs,
-      alignItems: 'center',
-    },
-    addButtonText: {
-      color: colors.interactive.primary,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-    quantityContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      backgroundColor: colors.interactive.primary,
-      borderRadius: 6,
-      paddingVertical: 2,
-    },
-    qtyButton: {
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
-    },
-    qtyButtonText: {
-      color: colors.text.inverse,
-      fontSize: 14,
-      fontWeight: '600',
-    },
-    qty: {
-      color: colors.text.inverse,
-      fontSize: 12,
-      fontWeight: '600',
+    bottomSheetSpacing: {
+      height: spacing.md,
     },
   });

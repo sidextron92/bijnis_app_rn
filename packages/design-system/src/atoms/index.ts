@@ -38,7 +38,15 @@ export { SushiTag, Tag, Chip } from './Tag';
 
 // Card
 export * from './Card';
-export { SushiCard, Card, SushiCardHeader, CardHeader, SushiCardContent, CardContent, SushiCardFooter, CardFooter } from './Card';
+export { SushiCard, Card, SushiCardHeader, CardHeader, SushiCardContent, CardContent, SushiCardFooter, CardFooter, ProductCard, ProductSelectionCard, DeliveryOptionCard } from './Card';
+
+// Table
+export * from './Table';
+export { SizeGuideTable } from './Table';
+
+// Input Components
+export * from './Input';
+export { SizeSetSelector } from './Input';
 
 // Loader
 export * from './Loader';

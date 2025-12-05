@@ -1,6 +1,7 @@
 import { SDUIPageLayout } from 'shared-types';
 import { mockCategories } from './categories';
 import { mockProducts } from './products';
+import { mockProductGridItems } from './productGrid';
 
 export const mockHomeLayout: SDUIPageLayout = {
   id: 'home-page',
@@ -63,19 +64,25 @@ export const mockHomeLayout: SDUIPageLayout = {
       data: {
         title: 'Deals of the Day',
         subtitle: 'Up to 30% off',
-        products: mockProducts
-          .filter(p => p.originalPrice && p.originalPrice > p.price)
-          .slice(0, 6)
-          .map(p => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            originalPrice: p.originalPrice,
-            image: p.images[0],
-            unit: p.unit,
-            action: { type: 'navigate', destination: `/product/${p.id}` },
-          })),
-        viewAllAction: { type: 'navigate', destination: '/deals' },
+        products: mockProductGridItems.slice(0, 6).map(p => ({
+          id: p.id,
+          name: p.title,
+          price: parseInt(p.price),
+          mrp: p.mrp ? parseInt(p.mrp) : parseInt(p.price),
+          image: p.imageUrl || 'https://via.placeholder.com/150',
+          unit: '',
+          // Full product details for ProductCard
+          category: p.category,
+          categoryColorScheme: p.categoryColorScheme,
+          productType: p.productType,
+          location: p.location,
+          moq: p.moq,
+          stockWarning: p.stockWarning,
+          deliveryTime: p.deliveryTime,
+          margin: p.margin,
+          variants: p.variants,
+        })),
+        seeAllLink: '/deals',
       },
     },
     {
@@ -86,23 +93,30 @@ export const mockHomeLayout: SDUIPageLayout = {
       },
     },
     {
-      id: 'dairy-rail',
+      id: 'snacks-rail',
       type: 'product_rail',
       data: {
-        title: 'Dairy & Breakfast',
-        subtitle: 'Fresh everyday',
-        products: mockProducts
-          .filter(p => p.categoryId === 'cat-2')
-          .map(p => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            originalPrice: p.originalPrice,
-            image: p.images[0],
-            unit: p.unit,
-            action: { type: 'navigate', destination: `/product/${p.id}` },
-          })),
-        viewAllAction: { type: 'navigate', destination: '/category/cat-2' },
+        title: 'Snacks & Beverages',
+        subtitle: 'Party time!',
+        products: mockProductGridItems.slice(6, 12).map(p => ({
+          id: p.id,
+          name: p.title,
+          price: parseInt(p.price),
+          mrp: p.mrp ? parseInt(p.mrp) : parseInt(p.price),
+          image: p.imageUrl || 'https://via.placeholder.com/150',
+          unit: '',
+          // Full product details for ProductCard
+          category: p.category,
+          categoryColorScheme: p.categoryColorScheme,
+          productType: p.productType,
+          location: p.location,
+          moq: p.moq,
+          stockWarning: p.stockWarning,
+          deliveryTime: p.deliveryTime,
+          margin: p.margin,
+          variants: p.variants,
+        })),
+        seeAllLink: '/category/snacks',
       },
     },
     {
@@ -113,50 +127,30 @@ export const mockHomeLayout: SDUIPageLayout = {
       },
     },
     {
-      id: 'snacks-rail',
-      type: 'product_rail',
-      data: {
-        title: 'Snacks & Beverages',
-        subtitle: 'Party time!',
-        products: mockProducts
-          .filter(p => p.categoryId === 'cat-3')
-          .map(p => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            originalPrice: p.originalPrice,
-            image: p.images[0],
-            unit: p.unit,
-            action: { type: 'navigate', destination: `/product/${p.id}` },
-          })),
-        viewAllAction: { type: 'navigate', destination: '/category/cat-3' },
-      },
-    },
-    {
-      id: 'divider-2',
-      type: 'divider',
-      data: {
-        thickness: 8,
-      },
-    },
-    {
       id: 'fruits-rail',
       type: 'product_rail',
       data: {
         title: 'Fruits & Vegetables',
         subtitle: 'Farm fresh',
-        products: mockProducts
-          .filter(p => p.categoryId === 'cat-1')
-          .map(p => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            originalPrice: p.originalPrice,
-            image: p.images[0],
-            unit: p.unit,
-            action: { type: 'navigate', destination: `/product/${p.id}` },
-          })),
-        viewAllAction: { type: 'navigate', destination: '/category/cat-1' },
+        products: mockProductGridItems.slice(0, 6).map(p => ({
+          id: p.id,
+          name: p.title,
+          price: parseInt(p.price),
+          mrp: p.mrp ? parseInt(p.mrp) : parseInt(p.price),
+          image: p.imageUrl || 'https://via.placeholder.com/150',
+          unit: '',
+          // Full product details for ProductCard
+          category: p.category,
+          categoryColorScheme: p.categoryColorScheme,
+          productType: p.productType,
+          location: p.location,
+          moq: p.moq,
+          stockWarning: p.stockWarning,
+          deliveryTime: p.deliveryTime,
+          margin: p.margin,
+          variants: p.variants,
+        })),
+        seeAllLink: '/category/fruits',
       },
     },
 

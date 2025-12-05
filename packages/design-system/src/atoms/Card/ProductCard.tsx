@@ -66,12 +66,16 @@ export interface ProductCardProps {
   onFavoritePress?: () => void;
   /** Card press handler */
   onPress?: () => void;
+  /** Add button press handler - opens bottom sheet in compact variant */
+  onAddPress?: () => void;
   /** Disabled state */
   disabled?: boolean;
   /** Custom style */
   style?: ViewStyle;
-  /** Image aspect ratio (width:height) - default 3.5:4 */
+  /** Image aspect ratio (width:height) - default 3.5:4 for default, 1:1 for compact */
   imageAspectRatio?: number;
+  /** Card width - for compact variant */
+  width?: number;
 }
 
 /**
@@ -122,9 +126,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isFavorite = false,
   onFavoritePress,
   onPress,
+  onAddPress,
   disabled = false,
   style,
-  imageAspectRatio = 3.5 / 4, // width:height = 3.5:4
+  imageAspectRatio = 3.5 / 4,
+  width,
 }) => {
   const { theme } = useTheme();
 
@@ -132,7 +138,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const remainingVariants = variants.length - maxVisibleVariants;
 
   const content = (
-    <View style={styles.container}>
+    <View style={[styles.container, width && { width }]}>
       {/* Image Container with 3.5:4 aspect ratio */}
       <View style={styles.imageContainer}>
         <SquircleView
@@ -185,6 +191,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               cornerStyle="squircle"
               cornerRadius={10}
               backgroundColor="#FFFFFF"
+              borderWidth={1}
+              borderColor="#E0E0E0"
               style={styles.favoriteIconContainer}
             >
               <View style={styles.favoriteIcon}>
@@ -203,8 +211,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               cornerStyle="squircle"
               cornerRadius={10}
               backgroundColor="#FFFFFF"
-              borderWidth={1}
-              borderColor="#3D3D46"
               style={styles.variantsInner}
             >
               <View style={styles.variantDots}>
@@ -242,7 +248,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             cornerRadius={7}
             backgroundColor={theme.mode === 'light' ? '#FFFFFF' : '#2F2F38'}
             borderWidth={theme.mode === 'dark' ? 1 : 0}
-            borderColor={theme.mode === 'dark' ? '#3D3D46' : 'transparent'}
+            borderColor={theme.mode === 'dark' ? '#3D3D46' : 'D4D4DB'}
             style={styles.productTypeTag}
           >
             <SushiText
@@ -362,6 +368,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </SushiText>
           )}
         </View>
+
+        {/* ADD Button */}
+        {onAddPress && (
+          <Pressable
+            onPress={onAddPress}
+            disabled={disabled}
+            style={styles.addButtonWrapper}
+          >
+            <SquircleView
+              cornerStyle="squircle"
+              cornerRadius={6}
+              backgroundColor="transparent"
+              borderWidth={1}
+              borderColor={theme.colors.interactive.primary}
+              style={styles.addButton}
+            >
+              <SushiText
+                variant="labelSmall"
+                customColor={theme.colors.interactive.primary}
+                style={styles.addButtonText}
+              >
+                ADD
+              </SushiText>
+            </SquircleView>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -415,7 +447,7 @@ const styles = StyleSheet.create({
   categoryTagInner: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-   
+
   },
   categoryText: {
     fontSize: 12,
@@ -447,7 +479,6 @@ const styles = StyleSheet.create({
     minHeight: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: '#3D3D46',
   },
   variantDots: {
     flexDirection: 'row',
@@ -542,6 +573,18 @@ const styles = StyleSheet.create({
   },
   mrp: {
     fontSize: 14,
+  },
+  addButtonWrapper: {
+    marginTop: spacing.sm,
+  },
+  addButton: {
+    paddingVertical: spacing.xs + 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   pressed: {
     opacity: 0.8,

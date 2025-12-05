@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { View } from 'react-native';
 import { ProductCard } from './ProductCard';
 import { ThemeProvider } from '../../theme';
+import { SushiText } from '../Text/SushiText';
 
 const meta: Meta<typeof ProductCard> = {
   title: 'Sushi/Atoms/Card/ProductCard',
@@ -366,6 +367,108 @@ export const InteractiveDemo: Story = {
         }}
         onPress={() => console.log('Card pressed')}
       />
+    );
+  },
+};
+
+// Compact Variant - For Horizontal Rails
+export const CompactVariant: Story = {
+  args: {
+    variant: 'compact',
+    title: 'Amul Milk',
+    price: '62',
+    mrp: '70',
+    width: 160,
+    onPress: () => console.log('Card pressed'),
+    onAddPress: () => console.log('Add button pressed - open bottom sheet'),
+  },
+};
+
+// Compact with MRP
+export const CompactWithMRP: Story = {
+  args: {
+    variant: 'compact',
+    title: 'Brown Bread',
+    price: '45',
+    mrp: '50',
+    width: 160,
+    onPress: () => console.log('Card pressed'),
+    onAddPress: () => console.log('Add button pressed'),
+  },
+};
+
+// Compact without MRP
+export const CompactWithoutMRP: Story = {
+  args: {
+    variant: 'compact',
+    title: 'Farm Eggs',
+    price: '120',
+    width: 160,
+    onPress: () => console.log('Card pressed'),
+    onAddPress: () => console.log('Add button pressed'),
+  },
+};
+
+// Compact Rail - Multiple Cards
+export const CompactRail: Story = {
+  render: () => (
+    <View style={{ flexDirection: 'row', gap: 12 }}>
+      <ProductCard
+        variant="compact"
+        title="Amul Milk"
+        price="62"
+        mrp="70"
+        width={160}
+        onPress={() => console.log('Card 1 pressed')}
+        onAddPress={() => console.log('Add 1')}
+      />
+      <ProductCard
+        variant="compact"
+        title="Brown Bread"
+        price="45"
+        mrp="50"
+        width={160}
+        onPress={() => console.log('Card 2 pressed')}
+        onAddPress={() => console.log('Add 2')}
+      />
+      <ProductCard
+        variant="compact"
+        title="Farm Eggs"
+        price="120"
+        width={160}
+        onPress={() => console.log('Card 3 pressed')}
+        onAddPress={() => console.log('Add 3')}
+      />
+    </View>
+  ),
+};
+
+// Compact Interactive
+export const CompactInteractive: Story = {
+  render: () => {
+    const [clicked, setClicked] = React.useState(false);
+
+    return (
+      <View>
+        <ProductCard
+          variant="compact"
+          title="Coca Cola"
+          price="40"
+          mrp="50"
+          width={160}
+          onPress={() => console.log('Card pressed')}
+          onAddPress={() => {
+            setClicked(true);
+            console.log('Add button clicked - would open bottom sheet');
+            setTimeout(() => setClicked(false), 1000);
+          }}
+        />
+        {clicked && (
+          <View style={{ marginTop: 16, padding: 8, backgroundColor: '#e0e0e0', borderRadius: 4 }}>
+            <SushiText>Bottom sheet would open here!</SushiText>
+          </View>
+        )}
+      </View>
     );
   },
 };

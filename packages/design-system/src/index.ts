@@ -43,6 +43,11 @@ export * from './tokens';
 export * from './atoms';
 
 // ============================================
+// Molecules (Composite Components)
+// ============================================
+export * from './molecules';
+
+// ============================================
 // Legacy Primitives (for backward compatibility)
 // ============================================
 export * from './primitives';
