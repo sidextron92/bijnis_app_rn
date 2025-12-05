@@ -203,6 +203,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               cornerStyle="squircle"
               cornerRadius={10}
               backgroundColor="#FFFFFF"
+              borderWidth={1}
+              borderColor="#3D3D46"
               style={styles.variantsInner}
             >
               <View style={styles.variantDots}>
@@ -445,6 +447,7 @@ const styles = StyleSheet.create({
     minHeight: 15,
     justifyContent: 'center',
     alignItems: 'center',
+    borderColor: '#3D3D46',
   },
   variantDots: {
     flexDirection: 'row',
@@ -479,7 +482,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    marginBottom: spacing.xs / 10,
+   // marginBottom: spacing.xs / 10,
     fontWeight: '600',
   },
   location: {
