@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, Animated, ActivityIndicator, View, useColorScheme } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HomeHeader } from '@/features/home/components/HomeHeader';
@@ -25,9 +25,13 @@ export default function HomeScreen() {
 
   // Tab state and animation
   const [selectedTab, setSelectedTab] = useState<string | undefined>();
+  const [displayedTab, setDisplayedTab] = useState<string | undefined>(); // Tab used for rendering background
   const indicatorPosition = useRef(new Animated.Value(0)).current;
   const indicatorWidth = useRef(new Animated.Value(0)).current;
   const tabLayouts = useRef<{ [key: string]: { x: number; width: number } }>({});
+
+  // Background fade animation for tab switching
+  const backgroundOpacity = useRef(new Animated.Value(1)).current;
 
   // Separate animated values for sticky header tabs (to avoid native driver conflicts)
   const stickyIndicatorPosition = useRef(new Animated.Value(0)).current;
@@ -41,6 +45,7 @@ export default function HomeScreen() {
     if (headerData?.tabs?.items && headerData.tabs.items.length > 0 && !selectedTab) {
       const initialTab = headerData.tabs.selectedTabId || headerData.tabs.items[0].id;
       setSelectedTab(initialTab);
+      setDisplayedTab(initialTab); // Also set displayed tab initially
     }
   }, [headerData, selectedTab]);
 
@@ -150,6 +155,48 @@ export default function HomeScreen() {
     ? 'rgba(40, 40, 40, 1)' // Dark grey for dark mode
     : 'rgba(255, 255, 255, 1)'; // White for light mode
 
+  // Handle tab change with fade animation
+  const handleTabChange = useCallback((tabId: string) => {
+    if (tabId === selectedTab) return; // Don't animate if same tab
+
+    // Fade out -> Change displayed tab -> Fade in
+    Animated.timing(backgroundOpacity, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => {
+      // Change the displayed tab (which updates the background) at the midpoint
+      setDisplayedTab(tabId);
+      setSelectedTab(tabId);
+
+      // Fade back in
+      Animated.timing(backgroundOpacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    console.log('Tab selected:', tabId);
+  }, [selectedTab, backgroundOpacity]);
+
+  // Transform API data to component props with displayed tab for dynamic backgrounds
+  // NOTE: This must be called before any conditional returns to satisfy React's Rules of Hooks
+  const headerProps = useMemo(() => {
+    if (!headerData) return null;
+
+    return transformHomeHeaderData(
+      headerData,
+      {
+        onLocationPress: () => {
+          console.log('Location pressed');
+        },
+        onTabSelect: handleTabChange,
+      },
+      displayedTab // Pass displayed tab for dynamic background (not selectedTab)
+    );
+  }, [headerData, displayedTab, handleTabChange]);
+
   // Handle header loading state
   if (headerLoading) {
     return (
@@ -165,7 +212,7 @@ export default function HomeScreen() {
   }
 
   // Handle header error state
-  if (headerError || !headerData) {
+  if (headerError || !headerData || !headerProps) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: theme.colors.background.primary }]}
@@ -179,17 +226,6 @@ export default function HomeScreen() {
       </SafeAreaView>
     );
   }
-
-  // Transform API data to component props
-  const headerProps = transformHomeHeaderData(headerData, {
-    onLocationPress: () => {
-      console.log('Location pressed');
-    },
-    onTabSelect: (tabId) => {
-      setSelectedTab(tabId);
-      console.log('Tab selected:', tabId);
-    },
-  });
 
   return (
     <View
@@ -207,15 +243,17 @@ export default function HomeScreen() {
             { useNativeDriver: false } // Required for height/opacity animations
           )}
         >
-          {/* Header with animated values for parallax */}
-          <HomeHeader
-            {...headerProps}
-            toolbarAnimatedHeight={toolbarHeight}
-            toolbarAnimatedOpacity={toolbarOpacity}
-            bannerAnimatedHeight={bannerHeight}
-            bannerAnimatedOpacity={bannerOpacity}
-            searchTabsAnimatedOpacity={searchTabsOpacity}
-          />
+          {/* Header with animated values for parallax and background transition */}
+          <Animated.View style={{ opacity: backgroundOpacity }}>
+            <HomeHeader
+              {...headerProps}
+              toolbarAnimatedHeight={toolbarHeight}
+              toolbarAnimatedOpacity={toolbarOpacity}
+              bannerAnimatedHeight={bannerHeight}
+              bannerAnimatedOpacity={bannerOpacity}
+              searchTabsAnimatedOpacity={searchTabsOpacity}
+            />
+          </Animated.View>
 
           {/* Main content */}
           <View style={[styles.content, { backgroundColor: theme.colors.background.secondary }]}>
@@ -239,10 +277,7 @@ export default function HomeScreen() {
             searchPlaceholders={headerProps.searchPlaceholders}
             categoryTabs={headerProps.categoryTabs}
             selectedTab={selectedTab}
-            onTabSelect={(tabId) => {
-              setSelectedTab(tabId);
-              headerProps.onTabSelect?.(tabId);
-            }}
+            onTabSelect={handleTabChange}
             tabLayouts={tabLayouts}
             indicatorPosition={stickyIndicatorPosition}
             indicatorWidth={stickyIndicatorWidth}

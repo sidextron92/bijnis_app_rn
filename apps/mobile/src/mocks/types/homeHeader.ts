@@ -106,6 +106,12 @@ export interface TabItem {
   enabled: boolean;
   visible: boolean;
   analytics?: AnalyticsData;
+  /** Tab-specific background configuration */
+  background: BackgroundConfig;
+  /** Tab-specific section backgrounds */
+  sectionBackgrounds?: SectionBackgrounds;
+  /** Tab-specific promotional banner */
+  banner?: SimpleBanner;
 }
 
 export interface TabIcon {
@@ -235,16 +241,18 @@ export interface ApiMetadata {
 
 export interface HomeHeaderApiResponse {
   delivery: DeliveryInfo;
-  background: BackgroundConfig;
-  sectionBackgrounds?: SectionBackgrounds;
   search: SearchConfig;
   user: UserInfo;
   tabs: TabsConfig;
-  /** Single promotional banner (new simplified format) */
-  banner?: SimpleBanner;
-  /** Legacy banners array (deprecated, use 'banner' instead) */
-  banners?: PromotionalBanner[];
   metadata?: ApiMetadata;
+  /** @deprecated Background moved to individual tab items */
+  background?: BackgroundConfig;
+  /** @deprecated Section backgrounds moved to individual tab items */
+  sectionBackgrounds?: SectionBackgrounds;
+  /** @deprecated Banner moved to individual tab items */
+  banner?: SimpleBanner;
+  /** @deprecated Legacy banners array (use tab-specific banners instead) */
+  banners?: PromotionalBanner[];
 }
 
 // ============================================================================

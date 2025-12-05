@@ -32,22 +32,6 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
     },
   },
 
-  background: {
-    type: 'gradient',
-    config: {
-      colors: ['#058234', '#03A64A', '#00C853'],
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: 1 },
-      type: 'linear',
-    },
-  },
-
-  sectionBackgrounds: {
-    toolbar: null,
-    searchBar: null,
-    tabNavigation: null,
-  },
-
   search: {
     placeholders: [
       'ice-cream',
@@ -84,6 +68,39 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
           category: 'navigation',
           action: 'tab_click_footwear',
         },
+        background: {
+          type: 'gradient',
+          config: {
+            colors: ['#058234', '#03A64A', '#00C853'],
+            start: { x: 0, y: 0 },
+            end: { x: 0, y: 1 },
+            type: 'linear',
+          },
+        },
+        sectionBackgrounds: {
+          toolbar: null,
+          searchBar: null,
+          tabNavigation: null,
+        },
+        banner: {
+          type: 'image',
+          url: 'https://github.com/sidextron92/random_assets/blob/main/bijnis_mascot.png?raw=true',
+          aspectRatio: 16 / 9,
+          target: {
+            type: 'screen',
+            config: {
+              screen: 'CategoryScreen',
+              params: {
+                category: 'footwear',
+                campaign: 'summer-collection',
+              },
+            },
+          },
+          analytics: {
+            impressionTrackingId: 'banner_footwear_impression',
+            clickTrackingId: 'banner_footwear_click',
+          },
+        },
       },
       {
         id: 'apparel',
@@ -97,7 +114,40 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
         visible: true,
         analytics: {
           category: 'navigation',
-          action: 'tab_click_snacks',
+          action: 'tab_click_apparel',
+        },
+        background: {
+          type: 'gradient',
+          config: {
+            colors: ['#D32F2F', '#F44336', '#E91E63'],
+            start: { x: 0, y: 0 },
+            end: { x: 1, y: 1 },
+            type: 'linear',
+          },
+        },
+        sectionBackgrounds: {
+          toolbar: null,
+          searchBar: null,
+          tabNavigation: null,
+        },
+        banner: {
+          type: 'image',
+          url: 'https://via.placeholder.com/800x450/D32F2F/FFFFFF?text=Apparel+Sale',
+          aspectRatio: 16 / 9,
+          target: {
+            type: 'screen',
+            config: {
+              screen: 'CategoryScreen',
+              params: {
+                category: 'apparel',
+                campaign: 'fashion-week',
+              },
+            },
+          },
+          analytics: {
+            impressionTrackingId: 'banner_apparel_impression',
+            clickTrackingId: 'banner_apparel_click',
+          },
         },
       },
       {
@@ -112,7 +162,40 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
         visible: true,
         analytics: {
           category: 'navigation',
-          action: 'tab_click_household',
+          action: 'tab_click_accessories',
+        },
+        background: {
+          type: 'gradient',
+          config: {
+            colors: ['#F57C00', '#FF9800', '#FFB74D'],
+            start: { x: 0, y: 0 },
+            end: { x: 1, y: 0 },
+            type: 'linear',
+          },
+        },
+        sectionBackgrounds: {
+          toolbar: null,
+          searchBar: null,
+          tabNavigation: null,
+        },
+        banner: {
+          type: 'image',
+          url: 'https://via.placeholder.com/800x450/F57C00/FFFFFF?text=Accessories+Collection',
+          aspectRatio: 16 / 9,
+          target: {
+            type: 'screen',
+            config: {
+              screen: 'CategoryScreen',
+              params: {
+                category: 'accessories',
+                campaign: 'trending-accessories',
+              },
+            },
+          },
+          analytics: {
+            impressionTrackingId: 'banner_accessories_impression',
+            clickTrackingId: 'banner_accessories_click',
+          },
         },
       },
       {
@@ -132,6 +215,39 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
           category: 'navigation',
           action: 'tab_click_beauty',
         },
+        background: {
+          type: 'gradient',
+          config: {
+            colors: ['#8E24AA', '#AB47BC', '#CE93D8'],
+            start: { x: 0, y: 0 },
+            end: { x: 0, y: 1 },
+            type: 'linear',
+          },
+        },
+        sectionBackgrounds: {
+          toolbar: null,
+          searchBar: null,
+          tabNavigation: null,
+        },
+        banner: {
+          type: 'image',
+          url: 'https://via.placeholder.com/800x450/8E24AA/FFFFFF?text=Beauty+Products',
+          aspectRatio: 16 / 9,
+          target: {
+            type: 'screen',
+            config: {
+              screen: 'CategoryScreen',
+              params: {
+                category: 'beauty',
+                campaign: 'skincare-essentials',
+              },
+            },
+          },
+          analytics: {
+            impressionTrackingId: 'banner_beauty_impression',
+            clickTrackingId: 'banner_beauty_click',
+          },
+        },
       },
       {
         id: 'electronics',
@@ -147,41 +263,46 @@ const mockHomeHeaderData: HomeHeaderApiResponse = {
           category: 'navigation',
           action: 'tab_click_electronics',
         },
+        background: {
+          type: 'gradient',
+          config: {
+            colors: ['#1565C0', '#1E88E5', '#42A5F5'],
+            start: { x: 0, y: 0 },
+            end: { x: 1, y: 1 },
+            type: 'linear',
+          },
+        },
+        sectionBackgrounds: {
+          toolbar: null,
+          searchBar: null,
+          tabNavigation: null,
+        },
+        banner: {
+          type: 'image',
+          url: 'https://via.placeholder.com/800x450/1565C0/FFFFFF?text=Electronics+Deals',
+          aspectRatio: 16 / 9,
+          target: {
+            type: 'screen',
+            config: {
+              screen: 'CategoryScreen',
+              params: {
+                category: 'electronics',
+                campaign: 'tech-sale',
+              },
+            },
+          },
+          analytics: {
+            impressionTrackingId: 'banner_electronics_impression',
+            clickTrackingId: 'banner_electronics_click',
+          },
+        },
       },
     ],
   },
 
-  banner: {
-    /**
-     * Single promotional banner - full-width image or animation
-     *
-     * Options:
-     * 1. Static image banner
-     * 2. Rive animation (recommended for interactive content)
-     * 3. Lottie animation (for simple pre-rendered animations)
-     */
-    type: 'image', // 'image' | 'rive' | 'lottie'
-    url: 'https://github.com/sidextron92/random_assets/blob/main/bijnis_mascot.png?raw=true',
-    aspectRatio: 16 / 9, // Width/Height ratio
-    target: {
-      type: 'screen',
-      config: {
-        screen: 'CategoryScreen',
-        params: {
-          category: 'special-offers',
-          campaign: 'housefull-deals',
-        },
-      },
-    },
-    analytics: {
-      impressionTrackingId: 'banner_housefull_impression',
-      clickTrackingId: 'banner_housefull_click',
-    },
-  },
-
   metadata: {
     lastUpdated: new Date().toISOString(),
-    version: '1.0.0',
+    version: '1.3.0',
     trackingId: `home_header_${Date.now()}`,
   },
 };

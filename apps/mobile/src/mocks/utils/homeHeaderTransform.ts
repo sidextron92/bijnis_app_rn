@@ -16,6 +16,7 @@ import {
  *
  * @param apiData - API response data
  * @param callbacks - Optional callback handlers
+ * @param selectedTabId - Currently selected tab ID (for dynamic background updates)
  * @returns Props object for HomeHeader component
  */
 export function transformHomeHeaderData(
@@ -25,26 +26,36 @@ export function transformHomeHeaderData(
     onAvatarPress?: () => void;
     onTabSelect?: (tabId: string) => void;
     onBannerClick?: (bannerId: string, target: any) => void;
-  }
+  },
+  selectedTabId?: string
 ): HomeHeaderProps {
+  // Get the selected tab or first visible tab
+  const tabId = selectedTabId || apiData.tabs.selectedTabId || apiData.tabs.items.find(item => item.visible && item.enabled)?.id;
+  const selectedTab = apiData.tabs.items.find(item => item.id === tabId);
+
+  // Use selected tab's background, or fallback to deprecated root-level background
+  const backgroundToUse = selectedTab?.background || apiData.background;
+  const sectionBackgroundsToUse = selectedTab?.sectionBackgrounds || apiData.sectionBackgrounds;
+  const bannerToUse = selectedTab?.banner || apiData.banner;
+
   return {
     // Delivery information
     deliveryTime: apiData.delivery.value,
     location: apiData.delivery.location.formatted,
 
-    // Main background
-    ...transformBackground(apiData.background),
+    // Main background from selected tab
+    ...(backgroundToUse ? transformBackground(backgroundToUse) : { backgroundColor: '#058234' }),
 
-    // Section backgrounds
-    ...(apiData.sectionBackgrounds && {
-      toolbarBackgroundColor: apiData.sectionBackgrounds.toolbar
-        ? extractBackgroundColor(apiData.sectionBackgrounds.toolbar)
+    // Section backgrounds from selected tab
+    ...(sectionBackgroundsToUse && {
+      toolbarBackgroundColor: sectionBackgroundsToUse.toolbar
+        ? extractBackgroundColor(sectionBackgroundsToUse.toolbar)
         : 'transparent',
-      searchBarBackgroundColor: apiData.sectionBackgrounds.searchBar
-        ? extractBackgroundColor(apiData.sectionBackgrounds.searchBar)
+      searchBarBackgroundColor: sectionBackgroundsToUse.searchBar
+        ? extractBackgroundColor(sectionBackgroundsToUse.searchBar)
         : 'transparent',
-      tabNavigationBackgroundColor: apiData.sectionBackgrounds.tabNavigation
-        ? extractBackgroundColor(apiData.sectionBackgrounds.tabNavigation)
+      tabNavigationBackgroundColor: sectionBackgroundsToUse.tabNavigation
+        ? extractBackgroundColor(sectionBackgroundsToUse.tabNavigation)
         : 'transparent',
     }),
 
@@ -52,7 +63,7 @@ export function transformHomeHeaderData(
     userInitials: apiData.user.initials,
     userAvatarUri: apiData.user.avatarUrl || undefined,
 
-    // Search placeholders
+    // Search placeholders (global)
     searchPlaceholders: apiData.search.placeholders,
 
     // Category tabs
@@ -68,15 +79,15 @@ export function transformHomeHeaderData(
       })),
     initialSelectedTab: apiData.tabs.selectedTabId,
 
-    // Promotional banner (single simplified format)
-    promotionalBanner: apiData.banner
+    // Promotional banner from selected tab (single simplified format)
+    promotionalBanner: bannerToUse
       ? {
-          imageUri: apiData.banner.type === 'image' ? apiData.banner.url : undefined,
-          animationUri: apiData.banner.type !== 'image' ? apiData.banner.url : undefined,
-          animationType: apiData.banner.type !== 'image' ? apiData.banner.type : undefined,
-          aspectRatio: apiData.banner.aspectRatio,
-          onPress: apiData.banner.target
-            ? () => callbacks?.onBannerClick?.(apiData.banner!.url, apiData.banner!.target)
+          imageUri: bannerToUse.type === 'image' ? bannerToUse.url : undefined,
+          animationUri: bannerToUse.type !== 'image' ? bannerToUse.url : undefined,
+          animationType: bannerToUse.type !== 'image' ? bannerToUse.type : undefined,
+          aspectRatio: bannerToUse.aspectRatio,
+          onPress: bannerToUse.target
+            ? () => callbacks?.onBannerClick?.(bannerToUse!.url, bannerToUse!.target)
             : undefined,
         }
       : undefined,
@@ -195,4 +206,28 @@ export function getNotificationCount(apiData: HomeHeaderApiResponse): number {
  */
 export function hasUserAvatar(apiData: HomeHeaderApiResponse): boolean {
   return !!apiData.user.avatarUrl;
+}
+
+/**
+ * Get background configuration for a specific tab
+ */
+export function getTabBackground(apiData: HomeHeaderApiResponse, tabId: string) {
+  const tab = apiData.tabs.items.find(item => item.id === tabId);
+  return tab?.background;
+}
+
+/**
+ * Get banner configuration for a specific tab
+ */
+export function getTabBanner(apiData: HomeHeaderApiResponse, tabId: string) {
+  const tab = apiData.tabs.items.find(item => item.id === tabId);
+  return tab?.banner;
+}
+
+/**
+ * Get section backgrounds for a specific tab
+ */
+export function getTabSectionBackgrounds(apiData: HomeHeaderApiResponse, tabId: string) {
+  const tab = apiData.tabs.items.find(item => item.id === tabId);
+  return tab?.sectionBackgrounds;
 }
