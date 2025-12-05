@@ -315,8 +315,8 @@ export function HomeHeader({
             <TypewriterText
               words={searchPlaceholders}
               color="#9C9C9C"
-              speed={100}
-              deleteSpeed={50}
+              speed={50}
+              deleteSpeed={25}
               delayBetween={2000}
               style={styles.searchPlaceholder}
             />
