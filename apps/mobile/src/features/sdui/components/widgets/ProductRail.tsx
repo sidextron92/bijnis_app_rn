@@ -9,6 +9,7 @@ import {
   ProductDetailBottomSheet,
 } from 'design-system';
 import { spacing } from '@/theme/spacing';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_MARGIN = 12;
@@ -19,9 +20,11 @@ const CARD_WIDTH = (SCREEN_WIDTH - HORIZONTAL_PADDING * 2 - CARD_MARGIN * 2) / 2
 export function ProductRail({ title, products, seeAllLink }: ProductRailProps) {
   const router = useRouter();
   const { theme } = useTheme();
+  const snackbarHostState = useSnackbar();
   const styles = useMemo(() => createStyles(theme.colors), [theme.colors]);
   const [selectedProduct, setSelectedProduct] = useState<ProductRailProps['products'][0] | null>(null);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   if (!products || products.length === 0) {
     return null;
@@ -39,6 +42,46 @@ export function ProductRail({ title, products, seeAllLink }: ProductRailProps) {
     });
     // TODO: Implement add to cart logic
     setBottomSheetVisible(false);
+  };
+
+  const handleFavoritePress = (productId: string) => {
+    const isCurrentlyFavorite = favorites.has(productId);
+    const isAdding = !isCurrentlyFavorite;
+
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(productId)) {
+        newFavorites.delete(productId);
+      } else {
+        newFavorites.add(productId);
+      }
+      return newFavorites;
+    });
+
+    // Show snackbar feedback after state update
+    setTimeout(() => {
+      if (isAdding) {
+        snackbarHostState.showSnackbar({
+          message: 'Product marked as favorite',
+          variant: 'success',
+          duration: 'short',
+          actionText: 'Close',
+          onAction: () => {
+            // Snackbar will auto-dismiss
+          },
+        });
+      } else {
+        snackbarHostState.showSnackbar({
+          message: 'Product removed from favorites',
+          variant: 'default',
+          duration: 'short',
+          actionText: 'Close',
+          onAction: () => {
+            // Snackbar will auto-dismiss
+          },
+        });
+      }
+    }, 0);
   };
 
   return (
@@ -63,7 +106,12 @@ export function ProductRail({ title, products, seeAllLink }: ProductRailProps) {
         contentContainerStyle={styles.list}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <ProductCardWrapper product={item} onAddPress={() => handleAddPress(item)} />
+          <ProductCardWrapper
+            product={item}
+            onAddPress={() => handleAddPress(item)}
+            isFavorite={favorites.has(item.id)}
+            onFavoritePress={() => handleFavoritePress(item.id)}
+          />
         )}
       />
 
@@ -143,9 +191,11 @@ export function ProductRail({ title, products, seeAllLink }: ProductRailProps) {
 interface ProductCardWrapperProps {
   product: ProductRailProps['products'][0];
   onAddPress: () => void;
+  isFavorite: boolean;
+  onFavoritePress: () => void;
 }
 
-function ProductCardWrapper({ product, onAddPress }: ProductCardWrapperProps) {
+function ProductCardWrapper({ product, onAddPress, isFavorite, onFavoritePress }: ProductCardWrapperProps) {
   const router = useRouter();
 
   const handlePress = () => {
@@ -169,6 +219,8 @@ function ProductCardWrapper({ product, onAddPress }: ProductCardWrapperProps) {
         mrp={product.mrp > product.price ? String(product.mrp) : undefined}
         imageSource={{ uri: product.image }}
         variants={product.variants}
+        isFavorite={isFavorite}
+        onFavoritePress={onFavoritePress}
         onPress={handlePress}
         onAddPress={onAddPress}
         width={CARD_WIDTH}

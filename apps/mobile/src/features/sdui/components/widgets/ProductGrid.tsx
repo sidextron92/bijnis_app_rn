@@ -6,6 +6,7 @@ import { ProductCard } from 'design-system';
 import { spacing } from '@/theme/spacing';
 import { homeApi } from '@/mocks/api';
 import type { ProductGridItem } from '@/mocks/data/productGrid';
+import { useSnackbar } from '@/contexts/SnackbarContext';
 
 interface ProductGridProps {
   title?: string;
@@ -21,6 +22,7 @@ const GAP_WIDTH = 16; // Gap between cards
 export function ProductGrid({ title = 'Popular Products', columns = 2, gap = 16 }: ProductGridProps) {
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
+  const snackbarHostState = useSnackbar();
   const [products, setProducts] = useState<ProductGridItem[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -52,6 +54,9 @@ export function ProductGrid({ title = 'Popular Products', columns = 2, gap = 16 
   };
 
   const handleFavoritePress = (productId: string) => {
+    const isCurrentlyFavorite = favorites.has(productId);
+    const isAdding = !isCurrentlyFavorite;
+
     setFavorites(prev => {
       const newFavorites = new Set(prev);
       if (newFavorites.has(productId)) {
@@ -61,6 +66,31 @@ export function ProductGrid({ title = 'Popular Products', columns = 2, gap = 16 
       }
       return newFavorites;
     });
+
+    // Show snackbar feedback after state update
+    setTimeout(() => {
+      if (isAdding) {
+        snackbarHostState.showSnackbar({
+          message: 'Product marked as favorite',
+          variant: 'success',
+          duration: 'short',
+          actionText: 'Close',
+          onAction: () => {
+            // Snackbar will auto-dismiss
+          },
+        });
+      } else {
+        snackbarHostState.showSnackbar({
+          message: 'Product removed from favorites',
+          variant: 'default',
+          duration: 'short',
+          actionText: 'Close',
+          onAction: () => {
+            // Snackbar will auto-dismiss
+          },
+        });
+      }
+    }, 0);
   };
 
   const handleProductPress = (productId: string) => {
@@ -75,7 +105,7 @@ export function ProductGrid({ title = 'Popular Products', columns = 2, gap = 16 
     <View style={styles.container}>
       {title && (
         <View style={styles.header}>
-          <SushiText variant="h3" weight="semibold">
+          <SushiText variant="h3">
             {title}
           </SushiText>
         </View>

@@ -195,6 +195,7 @@ export const SushiSnackbarHost: React.FC<SushiSnackbarHostProps> = ({
       {children}
       {snackbar && (
         <SushiSnackbarInternal
+          key={snackbar.id}
           {...snackbar}
           position={snackbar.position || position}
           bottomOffset={bottomOffset}
